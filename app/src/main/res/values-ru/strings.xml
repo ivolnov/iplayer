@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Проигрыватель</string>
+    <string name="album_img_description">Обложка альбома</string>
+    <string name="action_search">Поиск</string>
+    <string name="action_settings">Настройки</string>
+</resources>
