@@ -22,15 +22,23 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            buildConfigField "String", "ITUNES_URL", "\"https://itunes.apple.com\""
+        }
+        debug {
+            buildConfigField "String", "ITUNES_URL", "\"https://itunes.apple.com\""
         }
     }
 }
 
 def support = '25.1.0'
-def retrofit = '2.1.0'
 def dagger = '2.+'
-def butterKnife = "8.4.0"
-def moxy = "1.5.3"
+def retrofit = '2.+'
+def gson = '2.+'
+def rx = '2+'
+def adapter = '1+'
+def butterKnife = '8.4.0'
+def moxy = '1.+'
+def exoplayer = '2.+'
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
@@ -44,6 +52,14 @@ dependencies {
     implementation "com.arello-mobile:moxy:$moxy"
     implementation "com.arello-mobile:moxy-app-compat:$moxy"
     implementation "com.google.dagger:dagger:$dagger"
+    implementation "com.squareup.retrofit2:retrofit:$retrofit"
+    implementation "com.squareup.retrofit2:converter-gson:$gson"
+
+    implementation "io.reactivex.rxjava2:rxandroid:$rx"
+    implementation "io.reactivex.rxjava2:rxjava:$rx"
+    implementation "com.jakewharton.retrofit:retrofit2-rxjava2-adapter:$adapter"
+
+    implementation "com.google.android.exoplayer:exoplayer-core:$exoplayer"
 
     annotationProcessor "com.google.dagger:dagger-compiler:$dagger"
     annotationProcessor "com.arello-mobile:moxy-compiler:$moxy"

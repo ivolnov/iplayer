@@ -9,5 +9,5 @@
     android:layout_marginLeft="16dp"
     android:layout_marginRight="16dp"
     app:layoutManager="LinearLayoutManager"
-    tools:context=".ui.fragments.TrackListFragment"
+    tools:context=".android.fragments.TrackListFragment"
     tools:listitem="@layout/track_item" />

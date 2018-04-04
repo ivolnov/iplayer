@@ -1,5 +1,8 @@
 package com.intech.player.di;
 
+import com.intech.player.di.modules.UseCaseModule;
+import com.intech.player.mvp.presenters.TrackListPresenter;
+
 import javax.inject.Singleton;
 
 import dagger.Component;
@@ -12,7 +15,7 @@ import dagger.Component;
  */
 
 @Singleton
-@Component(modules = {})
+@Component(modules = {UseCaseModule.class})
 public interface AppComponent {
-
+    void inject(TrackListPresenter presenter);
 }

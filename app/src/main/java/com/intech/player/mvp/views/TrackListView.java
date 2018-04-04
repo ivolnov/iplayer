@@ -9,4 +9,5 @@ import com.arellomobile.mvp.MvpView;
  * @since 01.04.18
  */
 public interface TrackListView extends MvpView {
+
 }
