@@ -23,9 +23,11 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             buildConfigField "String", "ITUNES_URL", "\"https://itunes.apple.com\""
+            buildConfigField "String", "USER_AGENT", "\"IPlayer\""
         }
         debug {
             buildConfigField "String", "ITUNES_URL", "\"https://itunes.apple.com\""
+            buildConfigField "String", "USER_AGENT", "\"IPlayer\""
         }
     }
 }
@@ -39,6 +41,7 @@ def adapter = '1+'
 def butterKnife = '8.4.0'
 def moxy = '1.+'
 def exoplayer = '2.+'
+def mockito = '2.+'
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
@@ -60,11 +63,13 @@ dependencies {
     implementation "com.jakewharton.retrofit:retrofit2-rxjava2-adapter:$adapter"
 
     implementation "com.google.android.exoplayer:exoplayer-core:$exoplayer"
+    implementation "com.google.android.exoplayer:exoplayer-hls:$exoplayer"
 
     annotationProcessor "com.google.dagger:dagger-compiler:$dagger"
     annotationProcessor "com.arello-mobile:moxy-compiler:$moxy"
 
     testImplementation 'junit:junit:4.12'
+    testImplementation "org.mockito:mockito-core:$mockito"
 
     androidTestImplementation 'com.android.support.test:runner:1.0.1'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'

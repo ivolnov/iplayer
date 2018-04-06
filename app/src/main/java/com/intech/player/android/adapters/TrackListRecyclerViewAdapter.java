@@ -4,75 +4,76 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.intech.player.R;
-import com.intech.player.android.fragments.TrackListFragment.OnListFragmentInteractionListener;
-import com.intech.player.android.fragments.dummy.DummyContent.DummyItem;
+import com.intech.player.clean.entities.Track;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
- * {@link RecyclerView.Adapter} that can display a {@link DummyItem} and makes a call to the
- * specified {@link OnListFragmentInteractionListener}.
- * TODO: Replace the implementation with code for your data type.
+ * A {@link RecyclerView.Adapter} for {@link Track} entities.
+ *
+ * @author Ivan Volnov
+ * @since 01.04.18
  */
 public class TrackListRecyclerViewAdapter extends RecyclerView.Adapter<TrackListRecyclerViewAdapter.ViewHolder> {
 
-    private final List<DummyItem> mValues;
-    private final OnListFragmentInteractionListener mListener;
+    private final List<Track> mTracks;
+    private final ViewHolder.IViewHolderListener mListener;
 
-    public TrackListRecyclerViewAdapter(List<DummyItem> items, OnListFragmentInteractionListener listener) {
-        mValues = items;
+    public TrackListRecyclerViewAdapter(ViewHolder.IViewHolderListener listener) {
         mListener = listener;
+        mTracks = Collections.emptyList();
     }
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext())
+        final View view = LayoutInflater
+                .from(parent.getContext())
                 .inflate(R.layout.track_item, parent, false);
         return new ViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
-        holder.mItem = mValues.get(position);
-        holder.mIdView.setText(mValues.get(position).id);
-        holder.mContentView.setText(mValues.get(position).content);
-
-        holder.mView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (null != mListener) {
-                    // Notify the active callbacks interface (the activity, if the
-                    // fragment is attached to one) that an item has been selected.
-                    mListener.onListFragmentInteraction(holder.mItem);
-                }
-            }
-        });
+        final Track track = mTracks.get(position);
+        holder.mView.setOnClickListener(view -> mListener.onItemClicked(track));
+        holder.mArtist.setText(track.getArtist());
+        holder.mTrackName.setText(track.getTrackName());
+        if (holder.mArtworks == null) {
+            mListener.onLoadArtworks(track.getArtworkUrl());
+        } else {
+            //TODO:???
+            //holder.mArtworks.setImageDrawable(Drawable.createFromStream());
+        }
     }
 
     @Override
     public int getItemCount() {
-        return mValues.size();
+        return mTracks.size();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
-        public final View mView;
-        public final TextView mIdView;
-        public final TextView mContentView;
-        public DummyItem mItem;
+    public static class ViewHolder extends RecyclerView.ViewHolder {
+        final View mView;
+        final TextView mArtist;
+        final TextView mTrackName;
+        final ImageView mArtworks;
 
-        public ViewHolder(View view) {
+        ViewHolder(View view) {
             super(view);
             mView = view;
-            mIdView = (TextView) view.findViewById(R.id.artist);
-            mContentView = (TextView) view.findViewById(R.id.track_name);
+            //TODO buttterknife?
+            mArtist = view.findViewById(R.id.artist);
+            mTrackName = view.findViewById(R.id.track_name);
+            mArtworks =  view.findViewById(R.id.artworks_img);
         }
 
-        @Override
-        public String toString() {
-            return super.toString() + " '" + mContentView.getText() + "'";
+        public interface IViewHolderListener {
+            void onItemClicked(Track track);
+            void onLoadArtworks(String url);
         }
     }
 }

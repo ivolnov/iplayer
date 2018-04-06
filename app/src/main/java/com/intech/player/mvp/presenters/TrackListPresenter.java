@@ -5,17 +5,12 @@ import android.support.annotation.NonNull;
 import com.arellomobile.mvp.InjectViewState;
 import com.arellomobile.mvp.MvpPresenter;
 import com.intech.player.App;
-import com.intech.player.clean.entities.Track;
-import com.intech.player.clean.interactors.TrackListUseCase;
+import com.intech.player.clean.interactors.GetTrackListUseCase;
 import com.intech.player.mvp.views.TrackListView;
-
-import org.reactivestreams.Subscriber;
-import org.reactivestreams.Subscription;
 
 import javax.inject.Inject;
 
 import io.reactivex.disposables.Disposable;
-import io.reactivex.observers.DisposableObserver;
 
 /**
  * Self explanatory.
@@ -27,7 +22,7 @@ import io.reactivex.observers.DisposableObserver;
 public class TrackListPresenter extends MvpPresenter<TrackListView> {
 
     @Inject
-    TrackListUseCase trackListUseCase;
+    GetTrackListUseCase getTrackListUseCase;
 
     private Disposable mTrackListDisposable;
 
@@ -40,13 +35,19 @@ public class TrackListPresenter extends MvpPresenter<TrackListView> {
         super.onFirstViewAttach();
     }
 
-
     public void onEnterQuery(@NonNull String query) {
         dispose();
-        mTrackListDisposable = trackListUseCase
+        mTrackListDisposable = getTrackListUseCase
                 .getTracks(query)
-                .subscribeWith(trackListHandler());
+                .subscribe(
+                        track -> getViewState().addTrack(track),
+                        error -> getViewState().showError(getMessage(error))
+                );
 
+    }
+
+    public void loadArtworks(String url) {
+        //TODO: observe some use case... getViewState().addArtwork();
     }
 
     private void dispose() {
@@ -55,23 +56,8 @@ public class TrackListPresenter extends MvpPresenter<TrackListView> {
         }
     }
 
-    private DisposableObserver<Track> trackListHandler() {
-        return new DisposableObserver<Track>() {
-
-            @Override
-            public void onNext(Track track) {
-                //TODO: something to get an image...
-            }
-
-            @Override
-            public void onError(Throwable t) {
-                //TODO: compile an error message and ask the view to show it
-            }
-
-            @Override
-            public void onComplete() {
-                //TODO: time to refresh view's track list...
-            }
-        };
+    private String getMessage(Throwable error) {
+        //TODO: compile an error
+        return String.format("Oops...%s", error.getMessage());
     }
 }

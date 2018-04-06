@@ -1,11 +1,9 @@
 package com.intech.player.clean.interactors;
 
-import com.intech.player.clean.entities.Artwork;
-import com.intech.player.clean.entities.Preview;
 import com.intech.player.clean.entities.Track;
+import com.intech.player.clean.interactors.boundaries.TrackService;
 
 import io.reactivex.Observable;
-import io.reactivex.Single;
 
 /**
  * Self explanatory.
@@ -13,17 +11,11 @@ import io.reactivex.Single;
  * @author Ivan Volnov
  * @since 04.04.18
  */
-public class TrackListUseCase {
-
-    public interface TrackService {
-        Observable<Track> getTracks(String keyword);
-        Single<Artwork> getArtwork(String url);
-        Single<Preview> getPreview(String url);
-    }
+public class GetTrackListUseCase {
 
     private TrackService service;
 
-    public TrackListUseCase(TrackService service) {
+    public GetTrackListUseCase(TrackService service) {
         this.service = service;
     }
 

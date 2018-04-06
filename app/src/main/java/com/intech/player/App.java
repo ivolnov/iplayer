@@ -6,9 +6,10 @@ import android.support.annotation.VisibleForTesting;
 
 import com.intech.player.di.AppComponent;
 import com.intech.player.di.DaggerAppComponent;
+import com.intech.player.di.modules.ContextModule;
 
 /**
- * PlayerController application itself.
+ * IPlayer application itself.
  *
  * @author Ivan Volnov
  * @since 01.04.18
@@ -19,9 +20,9 @@ public class App extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-
         sAppComponent = DaggerAppComponent
                 .builder()
+                .contextModule(new ContextModule(this))
                 .build();
     }
 

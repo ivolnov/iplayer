@@ -5,7 +5,7 @@ import android.support.annotation.NonNull;
 import com.intech.player.clean.entities.Artwork;
 import com.intech.player.clean.entities.Preview;
 import com.intech.player.clean.entities.Track;
-import com.intech.player.clean.interactors.TrackListUseCase;
+import com.intech.player.clean.interactors.boundaries.TrackService;
 
 import io.reactivex.Observable;
 import io.reactivex.Single;
@@ -16,7 +16,7 @@ import io.reactivex.Single;
  * @author Ivan Volnov
  * @since 03.04.18
  */
-public class ITunesTrackService implements TrackListUseCase.TrackService {
+public class ITunesTrackService implements TrackService {
 
     private static final String VIDEO_SUFFIX = "m4v";
 

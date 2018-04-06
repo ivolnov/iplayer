@@ -1,9 +1,9 @@
 package com.intech.player.di.modules;
 
 import com.intech.player.api.ITunesTrackService;
-import com.intech.player.clean.interactors.TrackListUseCase;
-
-import javax.inject.Singleton;
+import com.intech.player.clean.interactors.GetTrackListUseCase;
+import com.intech.player.clean.interactors.StartPlayerUseCase;
+import com.intech.player.controller.ITunesPlayerController;
 
 import dagger.Module;
 import dagger.Provides;
@@ -17,8 +17,12 @@ import dagger.Provides;
 @Module(includes = {ITunesModule.class})
 public class UseCaseModule {
     @Provides
-    @Singleton
-    TrackListUseCase provideTrackListuseCase(ITunesTrackService service) {
-        return new TrackListUseCase(service);
+    GetTrackListUseCase provideTrackListUseCase(ITunesTrackService service) {
+        return new GetTrackListUseCase(service);
+    }
+
+    @Provides
+    StartPlayerUseCase provideStartPlayerUseCase(ITunesPlayerController player) {
+        return new StartPlayerUseCase(player);
     }
 }
