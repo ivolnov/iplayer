@@ -1,12 +1,16 @@
 package com.intech.player.mvp.presenters;
 
+import android.util.Log;
+
 import com.arellomobile.mvp.InjectViewState;
 import com.arellomobile.mvp.MvpPresenter;
 import com.intech.player.App;
+import com.intech.player.BuildConfig;
 import com.intech.player.clean.boundaries.model.EventRequestModel;
 import com.intech.player.clean.interactors.GetPlayerEventsUseCase;
 import com.intech.player.clean.interactors.PausePlayerUseCase;
 import com.intech.player.clean.interactors.StartPlayerUseCase;
+import com.intech.player.mvp.models.TrackViewModel;
 import com.intech.player.mvp.presenters.utils.UserMessageCompiler;
 import com.intech.player.mvp.views.PlayerView;
 
@@ -28,6 +32,9 @@ import static com.intech.player.mvp.presenters.PlayerPresenter.ButtonState.Play;
 @InjectViewState
 public class PlayerPresenter extends MvpPresenter<PlayerView> {
 
+    private static final String TAG = PlayerPresenter.class.getSimpleName();
+    private static final String VIDEO_EXTENTION = "m4v";
+
     enum ButtonState {Play, Pause}
 
     @Inject
@@ -37,16 +44,34 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
     @Inject
     GetPlayerEventsUseCase getPlayerEventsUseCase;
 
-    private ButtonState mButtonState = ButtonState.Play;
+    private ButtonState mButtonState = Play;
 
     private Disposable mPlayerEventsDisposable;
+
+    private TrackViewModel mTrack;
 
     public PlayerPresenter() {
         App.getAppComponent().inject(this);
     }
 
+    public boolean hasTrack() {
+        return mTrack != null;
+    }
+
+    public void setTrack(TrackViewModel track) {
+        mTrack = track;
+    }
+
+    public TrackViewModel getTrack() {
+        return mTrack;
+    }
+
+    public boolean isVideo() {
+        return hasTrack() && getTrack().getPreviewUrl().endsWith(VIDEO_EXTENTION);
+    }
+
     public void listenToPlayer(boolean listen) {
-        mPlayerEventsDisposable.dispose();
+        disposeEvents();
         if (listen) {
             mPlayerEventsDisposable = getPlayerEventsUseCase
                     .execute()
@@ -114,10 +139,16 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
     }
 
     private void handleError(Throwable error) {
-        getViewState().showError(getMessage(error));
+        final String message = UserMessageCompiler.from(error);
+        if (BuildConfig.DEBUG) {
+            Log.e(TAG, message);
+        }
+        getViewState().showError(message);
     }
 
-    private String getMessage(Throwable error) {
-        return UserMessageCompiler.from(error);
+    private void disposeEvents() {
+        if (mPlayerEventsDisposable != null) {
+            mPlayerEventsDisposable.dispose();
+        }
     }
 }

@@ -1,10 +1,12 @@
 package com.intech.player.mvp.presenters;
 
 import android.support.annotation.NonNull;
+import android.util.Log;
 
 import com.arellomobile.mvp.InjectViewState;
 import com.arellomobile.mvp.MvpPresenter;
 import com.intech.player.App;
+import com.intech.player.BuildConfig;
 import com.intech.player.clean.interactors.GetTrackListUseCase;
 import com.intech.player.mvp.presenters.utils.UserMessageCompiler;
 import com.intech.player.mvp.views.TrackListView;
@@ -26,6 +28,8 @@ import static com.intech.player.mvp.models.utils.ModelConverter.asTrackViewModel
 @InjectViewState
 public class TrackListPresenter extends MvpPresenter<TrackListView> {
 
+    private static final String TAG = TrackListPresenter.class.getSimpleName();
+
     @Inject
     GetTrackListUseCase getTrackListUseCase;
 
@@ -44,7 +48,7 @@ public class TrackListPresenter extends MvpPresenter<TrackListView> {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
                         track -> getViewState().addTrack(asTrackViewModel(track)),
-                        error -> getViewState().showError(getMessage(error))
+                        this::handleError
                 );
 
     }
@@ -55,7 +59,11 @@ public class TrackListPresenter extends MvpPresenter<TrackListView> {
         }
     }
 
-    private String getMessage(Throwable error) {
-        return UserMessageCompiler.from(error);
+    private void handleError(Throwable error) {
+        final String message = UserMessageCompiler.from(error);
+        if (BuildConfig.DEBUG) {
+            Log.e(TAG, message);
+        }
+        getViewState().showError(message);
     }
 }

@@ -1,6 +1,7 @@
 package com.intech.player.android.adapters;
 
 import android.support.v7.widget.RecyclerView;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,7 +14,7 @@ import com.intech.player.clean.boundaries.model.TrackRequestModel;
 import com.intech.player.mvp.models.TrackViewModel;
 import com.squareup.picasso.Picasso;
 
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -37,7 +38,7 @@ public class TrackListRecyclerViewAdapter extends RecyclerView.Adapter<TrackList
 
     public TrackListRecyclerViewAdapter(ViewHolder.IViewHolderListener listener) {
         mListener = listener;
-        mTracks = Collections.emptyList();
+        mTracks = new ArrayList<>();
         App.getAppComponent().inject(this);
     }
 
@@ -52,21 +53,26 @@ public class TrackListRecyclerViewAdapter extends RecyclerView.Adapter<TrackList
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
         final TrackViewModel track = mTracks.get(position);
-        holder.mView.setOnClickListener(view -> mListener.onItemClicked(track));
-        holder.mArtist.setText(track.getArtist());
-        holder.mTrackName.setText(track.getTrackName());
+        holder.view.setOnClickListener(view -> mListener.onItemClicked(track));
+        holder.artist.setText(track.getArtist());
+        holder.trackName.setText(track.getTrackName());
         picasso
                 .load(track.getArtworkUrl())
                 .placeholder(R.drawable.ic_picasso_placeholder)
                 .error(R.drawable.ic_picasso_error)
-                //.resizeDimen(R.dimen.list_detail_image_size, R.dimen.list_detail_image_size)
-                .centerInside()
+                .fit()
+                .centerCrop(Gravity.FILL)
                 .tag(this)
-                .into(holder.mArtworks);
+                .into(holder.artworks);
     }
 
     public void addTrack(TrackViewModel track) {
         mTracks.add(track);
+        notifyDataSetChanged();
+    }
+
+    public void clear() {
+        mTracks.clear();
         notifyDataSetChanged();
     }
 
@@ -76,17 +82,17 @@ public class TrackListRecyclerViewAdapter extends RecyclerView.Adapter<TrackList
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        View mView;
+        View view;
         @BindView(R.id.artist)
-        TextView mArtist;
+        TextView artist;
         @BindView(R.id.track_name)
-        TextView mTrackName;
+        TextView trackName;
         @BindView(R.id.artworks_img)
-        ImageView mArtworks;
+        ImageView artworks;
 
         ViewHolder(View view) {
             super(view);
-            mView = view;
+            this.view = view;
             ButterKnife.bind(this, view);
         }
 

@@ -36,6 +36,7 @@ public class TrackViewModel implements Parcelable {
         parcel.writeString(previewUrl);
     }
 
+    private boolean isAudio;
     private String artist;
     private String trackName;
     private String artworkUrl;

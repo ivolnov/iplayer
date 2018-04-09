@@ -6,23 +6,29 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.support.annotation.NonNull;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
-import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 
+import com.arellomobile.mvp.MvpAppCompatFragment;
 import com.arellomobile.mvp.presenter.InjectPresenter;
+import com.intech.player.App;
 import com.intech.player.R;
 import com.intech.player.android.services.PlayerBoundForegroundService;
 import com.intech.player.mvp.models.TrackViewModel;
 import com.intech.player.mvp.presenters.PlayerPresenter;
 import com.intech.player.mvp.views.PlayerView;
+import com.squareup.picasso.Picasso;
+
+import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -35,7 +41,7 @@ import static com.intech.player.android.fragments.TrackListFragment.EXTRA_SELECT
  * @author Ivan Volnov
  * @since 01.04.18
  */
-public class PlayerFragment extends Fragment  implements PlayerView {
+public class PlayerFragment extends MvpAppCompatFragment implements PlayerView {
 
     public static final String EXTRA_TRACK = "com.intech.player.EXTRA_TRACK";
 
@@ -43,11 +49,16 @@ public class PlayerFragment extends Fragment  implements PlayerView {
     PlayerPresenter playerPresenter;
 
     @BindView(R.id.player_button)
-    FloatingActionButton mButton;
+    FloatingActionButton button;
     @BindView(R.id.player_surface)
-    SurfaceView mSurface;
+    SurfaceView surface;
+    @BindView(R.id.player_artwork)
+    ImageView artwork;
     @BindView(R.id.progress_bar)
-    ProgressBar mProgressBar;
+    ProgressBar progressBar;
+
+    @Inject
+    Picasso picasso;
 
     private CoordinatorLayout mCoordinatorLayout;
 
@@ -56,7 +67,11 @@ public class PlayerFragment extends Fragment  implements PlayerView {
         public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
             final PlayerBoundForegroundService.SurfaceConsumer surfaceConsumer
                     = (PlayerBoundForegroundService.SurfaceConsumer) iBinder;
-            surfaceConsumer.setSurfaceView(mSurface);
+            if (playerPresenter.isVideo()) {
+                surface.setVisibility(View.VISIBLE);
+                artwork.setVisibility(View.GONE);
+                surfaceConsumer.setSurfaceView(surface);
+            }
         }
 
         @Override
@@ -65,16 +80,40 @@ public class PlayerFragment extends Fragment  implements PlayerView {
         }
     };
 
-    public PlayerFragment() {}
+    public PlayerFragment() {
+        App.getAppComponent().inject(this);
+    }
+
 
     @Override
-    public View onCreateView(LayoutInflater inflater,
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        if (getActivity() != null) {
+            final TrackViewModel track = getActivity()
+                    .getIntent()
+                    .getParcelableExtra(EXTRA_SELECTED_TRACK);
+            playerPresenter.setTrack(track);
+        }
+    }
+
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container,
                              Bundle savedInstanceState) {
         mCoordinatorLayout = (CoordinatorLayout) inflater
                 .inflate(R.layout.fragment_player, container, false);
 
         ButterKnife.bind(this, mCoordinatorLayout);
+
+        if (playerPresenter.hasTrack()) {
+            picasso
+                    .load(playerPresenter.getTrack().getArtworkUrl())
+                    .error(R.drawable.ic_picasso_error)
+                    .tag(this)
+                    .fit()
+                    .centerCrop()
+                    .into(artwork);
+        }
 
         return mCoordinatorLayout;
     }
@@ -83,20 +122,21 @@ public class PlayerFragment extends Fragment  implements PlayerView {
     public void onStart() {
         super.onStart();
 
-        final TrackViewModel track = getActivity()
-                .getIntent()
-                .getParcelableExtra(EXTRA_SELECTED_TRACK);
+        if (getActivity() == null) {
+            return;
+        }
 
-        final Intent intent = new Intent(getActivity(), PlayerBoundForegroundService.class)
-                .putExtra(EXTRA_TRACK, track);
-
-        getActivity().bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+        if (playerPresenter.hasTrack()) {
+            final Intent intent = new Intent(getActivity(), PlayerBoundForegroundService.class)
+                    .putExtra(EXTRA_TRACK, playerPresenter.getTrack());
+            getActivity().bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+        }
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        mButton.setOnClickListener(view -> playerPresenter.buttonCLicked());
+        button.setOnClickListener(view -> playerPresenter.buttonCLicked());
         playerPresenter.listenToPlayer(true);
     }
 
@@ -104,7 +144,7 @@ public class PlayerFragment extends Fragment  implements PlayerView {
     @Override
     public void onPause() {
         super.onPause();
-        mButton.setOnClickListener(null);
+        button.setOnClickListener(null);
         playerPresenter.listenToPlayer(false);
     }
 
@@ -112,7 +152,9 @@ public class PlayerFragment extends Fragment  implements PlayerView {
     @Override
     public void onStop() {
         super.onStop();
-        getActivity().unbindService(mConnection);
+        if (getActivity() != null) {
+            getActivity().unbindService(mConnection);
+        }
     }
 
     @Override
@@ -124,16 +166,21 @@ public class PlayerFragment extends Fragment  implements PlayerView {
 
     @Override
     public void setButtonPlay() {
-        mButton.setImageDrawable(ContextCompat.getDrawable(getContext(), android.R.drawable.ic_media_play));
+        if (getContext() != null) {
+            button.setImageDrawable(ContextCompat.getDrawable(getContext(), R.drawable.ic_play));
+        }
+
     }
 
     @Override
     public void setButtonPause() {
-        mButton.setImageDrawable(ContextCompat.getDrawable(getContext(), android.R.drawable.ic_media_pause));
+        if (getContext() != null) {
+            button.setImageDrawable(ContextCompat.getDrawable(getContext(), R.drawable.ic_pause));
+        }
     }
 
     @Override
     public void setProgress(double progress) {
-        mProgressBar.setProgress((int)(progress * mProgressBar.getMax()));
+        progressBar.setProgress((int)(progress * progressBar.getMax()));
     }
 }

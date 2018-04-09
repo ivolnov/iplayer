@@ -1,7 +1,8 @@
 <resources>
     <string name="app_name">Player</string>
-    <string name="artworks_img_description">Album image</string>
+    <string name="artworks_img_description">Artwork</string>
     <string name="player_surface_description">Player screen</string>
+    <string name="player_artwork_description">Player artwork</string>
     <string name="action_search">Search</string>
     <string name="action_settings">Settings</string>
 </resources>

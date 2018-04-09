@@ -4,6 +4,8 @@ import com.intech.player.api.ITunesApi;
 import com.intech.player.api.ITunesTrackService;
 import com.intech.player.controller.ITunesPlayerController;
 
+import javax.inject.Singleton;
+
 import dagger.Module;
 import dagger.Provides;
 import retrofit2.Retrofit;
@@ -27,6 +29,7 @@ public class ITunesModule {
     }
 
     @Provides
+    @Singleton
     public ITunesPlayerController provideITunesPlayerController() {
         return new ITunesPlayerController();
     }

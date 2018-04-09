@@ -8,20 +8,33 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <SurfaceView
-            android:id="@+id/player_surface"
+        <FrameLayout
+            android:animateLayoutChanges="true"
+            android:id="@+id/player_content"
             android:layout_width="fill_parent"
             android:layout_height="0dp"
-            android:layout_weight=".7"
-            android:contentDescription="@string/player_surface_description"
-            android:src="@android:color/transparent" />
+            android:layout_weight=".8">
+            <SurfaceView
+                android:visibility="gone"
+                android:id="@+id/player_surface"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:contentDescription="@string/player_surface_description"
+                android:src="@android:color/transparent"/>
+            <ImageView
+                android:id="@+id/player_artwork"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:contentDescription="@string/player_artwork_description"
+                android:src="@android:color/transparent" />
+        </FrameLayout>
 
         <ProgressBar
             android:id="@+id/progress_bar"
             style="?android:attr/progressBarStyleHorizontal"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight=".3"/>
+            android:layout_weight=".2"/>
     </LinearLayout>
 
     <android.support.design.widget.FloatingActionButton
@@ -29,9 +42,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:fabSize="normal"
-        app:layout_anchor="@id/artworks_img"
+        app:layout_anchor="@id/player_content"
         app:layout_anchorGravity="bottom|center_horizontal"
         app:elevation="@dimen/fab_elevation"
-        app:srcCompat="@android:drawable/ic_media_play" />
+        app:srcCompat="@drawable/ic_play" />
 
 </android.support.design.widget.CoordinatorLayout>

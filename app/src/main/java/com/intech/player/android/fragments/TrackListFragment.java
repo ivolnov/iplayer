@@ -42,7 +42,7 @@ public class TrackListFragment extends MvpAppCompatFragment
     TrackListPresenter trackListPresenter;
 
     @BindView(R.id.list)
-    RecyclerView mRecyclerView;
+    RecyclerView recyclerView;
 
     private CoordinatorLayout mCoordinatorLayout;
     private TrackListRecyclerViewAdapter mAdapter;
@@ -52,6 +52,7 @@ public class TrackListFragment extends MvpAppCompatFragment
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
     }
 
     @Override
@@ -64,8 +65,8 @@ public class TrackListFragment extends MvpAppCompatFragment
         ButterKnife.bind(this, mCoordinatorLayout);
 
         mAdapter = new TrackListRecyclerViewAdapter(this);
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        mRecyclerView.setAdapter(mAdapter);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        recyclerView.setAdapter(mAdapter);
 
         return mCoordinatorLayout;
     }
@@ -106,13 +107,13 @@ public class TrackListFragment extends MvpAppCompatFragment
         return  new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                trackListPresenter.onEnterQuery(query);
                 return false;
             }
 
             @Override
             public boolean onQueryTextChange(String query) {
-                //trackListPresenter.onEnterQuery(query);
+                mAdapter.clear();
+                trackListPresenter.onEnterQuery(query);
                 return false;
             }
         };

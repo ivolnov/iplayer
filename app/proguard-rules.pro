@@ -26,3 +26,11 @@
 -dontwarn javax.annotation.**
 -dontwarn org.conscrypt.**
 -keepnames class okhttp3.internal.publicsuffix.PublicSuffixDatabase
+
+#Butterknife
+-keep public class * implements butterknife.Unbinder { public <init>(**, android.view.View); }
+-keep class butterknife.*
+-keepclasseswithmembernames class * { @butterknife.* <methods>; }
+-keepclasseswithmembernames class * { @butterknife.* <fields>; }
+
+#-keep class **$$ViewBinder { *; }

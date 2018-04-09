@@ -3,6 +3,7 @@ package com.intech.player.di;
 import android.content.Context;
 
 import com.intech.player.android.adapters.TrackListRecyclerViewAdapter;
+import com.intech.player.android.fragments.PlayerFragment;
 import com.intech.player.android.services.PlayerBoundForegroundService;
 import com.intech.player.di.modules.ContextModule;
 import com.intech.player.di.modules.PicassoModule;
@@ -29,6 +30,7 @@ public interface AppComponent {
     void inject(TrackListPresenter presenter);
     void inject(PlayerBoundForegroundService service);
     void inject(PlayerPresenter presenter);
+    void inject(PlayerFragment fragment);
 
     Context getContext();
 }
