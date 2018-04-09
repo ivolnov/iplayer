@@ -1,7 +1,8 @@
 package com.intech.player.clean.interactors;
 
-import com.intech.player.clean.entities.Track;
-import com.intech.player.clean.interactors.boundaries.TrackService;
+import com.intech.player.clean.boundaries.TrackService;
+import com.intech.player.clean.boundaries.model.TrackRequestModel;
+import com.intech.player.clean.entities.SearchQueryRule;
 
 import io.reactivex.Observable;
 
@@ -19,8 +20,9 @@ public class GetTrackListUseCase {
         this.service = service;
     }
 
-    public Observable<Track> getTracks(String keyword) {
-        //TODO: validate keyword
-        return service.getTracks(keyword);
+    public Observable<TrackRequestModel> execute(String keyword) {
+        return SearchQueryRule.validate(keyword)
+                ? service.getTracks(keyword)
+                : Observable.empty();
     }
 }

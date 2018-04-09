@@ -9,5 +9,8 @@ import com.arellomobile.mvp.MvpView;
  * @since 01.04.18
  */
 public interface PlayerView extends MvpView {
-
+    void showError(String error);
+    void setButtonPlay();
+    void setButtonPause();
+    void setProgress(double progress);
 }

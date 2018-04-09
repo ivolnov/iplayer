@@ -1,55 +1,77 @@
 package com.intech.player.android.services;
 
 import android.app.Notification;
-import android.app.Service;
 import android.content.Intent;
+import android.os.Binder;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
+import android.util.Log;
+import android.view.SurfaceView;
 
 import com.intech.player.App;
-import com.intech.player.clean.interactors.boundaries.PlayerController;
+import com.intech.player.BuildConfig;
+import com.intech.player.clean.boundaries.model.EventRequestModel;
 import com.intech.player.controller.ITunesPlayerController;
+import com.intech.player.di.DaggerPlayerComponent;
+import com.intech.player.mvp.models.TrackViewModel;
 
 import javax.inject.Inject;
 
-import io.reactivex.CompletableObserver;
 import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
+
+import static com.intech.player.android.fragments.PlayerFragment.EXTRA_TRACK;
+import static com.intech.player.android.services.PlayerBoundForegroundService.PlayerState.Paused;
+import static com.intech.player.android.services.PlayerBoundForegroundService.PlayerState.Playing;
+import static com.intech.player.mvp.models.utils.ModelConverter.asTrackRequestModel;
+import static com.intech.player.mvp.models.utils.ModelConverter.asTrackViewModel;
 
 /**
  * A bound service that moves to foreground when player is on and returns to background on pause.
  * Assumed to be released with player on unbind during pause or by swiping out notification.
- * Learns info about the world by observing player events.
- *
- * Don't start explicitly.
+ * Observes player events to update notifications.
  *
  * @author Ivan Volnov
  * @since 01.04.18
  */
-public class PlayerBoundForegroundService extends Service {
+public class PlayerBoundForegroundService extends android.app.Service {
 
-    public static final String CHANNEL_ID = "ITunesPlayer";
+    private static final String TAG = PlayerBoundForegroundService.class.getSimpleName();
+
+    public static final String CHANNEL_ID = "IPlayer";
 
     public static final int FOREGROUND_ID = 1;
     public static final int NOTIFICATION_ID = 1;
 
     public static final int MAX_PROGRESS = 100;
 
-    private enum PlayerState {Playing, Paused}
+    public enum PlayerState {Playing, Paused}
 
-    private PlayerState mState = PlayerState.Paused;
+    public interface SurfaceConsumer {
+        void setSurfaceView(SurfaceView view);;
+    }
+
+    private PlayerState mState = Paused;
     private NotificationCompat.Builder mNotificationBuilder;
     private NotificationManagerCompat mNotificationManager;
 
     private int mProgress;
-    private String mArtist;
-    private String mTrack;
+    private TrackViewModel mTrack;
 
-    private Disposable mDisposable;
+    private Disposable mEventsDisposable;
+    private Disposable mStopDisposable;
+
+    private class LocalBinder extends Binder implements SurfaceConsumer {
+        @Override
+        public void setSurfaceView(SurfaceView view) {
+            PlayerBoundForegroundService.this.playerController.setVideoSurface(view);
+        }
+    }
 
     @Inject
-    ITunesPlayerController mPlayerController;
+    ITunesPlayerController playerController;
 
     public PlayerBoundForegroundService() {
         App.getAppComponent().inject(this);
@@ -58,33 +80,47 @@ public class PlayerBoundForegroundService extends Service {
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
-        mDisposable = mPlayerController
-                .getPlayerEvents()
-                .subscribe(
-                        this::handleEvent,
-                        this::handleError
-                );
-        return null;
+        final TrackViewModel track = intent.getParcelableExtra(EXTRA_TRACK);
+        mEventsDisposable = subscribeOnPlayerEvents();
+        if (isNew(track)) {
+            stopForeground(true);
+            DaggerPlayerComponent
+                    .builder()
+                    .context(App.getAppComponent().getContext())
+                    .track(asTrackRequestModel(track))
+                    .build()
+                    .inject(playerController);
+        }
+
+        return new LocalBinder();
     }
 
     @Override
     public boolean onUnbind(Intent intent) {
-        if (mState != PlayerState.Playing) {
-            mDisposable.dispose();
-            mPlayerController
+        super.onUnbind(intent);
+        playerController.clearVideoSurface();
+        if (mState != Playing) {
+            mEventsDisposable.dispose();
+            mStopDisposable = playerController
                     .stop()
-                    .subscribe(completableHandler());
+                    .subscribeOn(Schedulers.single())
+                    .observeOn(Schedulers.single())
+                    .subscribe(
+                            () -> mStopDisposable.dispose(),
+                            this::handleError);
         }
         return false;
     }
 
-    private void handleEvent(PlayerController.Event event) {
-        switch (event) {
+    private void handleEvent(EventRequestModel event) {
+        switch (event.getType()) {
             case Start:
                 startForeground(event);
+                mState = Playing;
                 break;
             case Pause:
                 stopForeground(true);
+                mState = Paused;
                 break;
             case Progress:
                 onTrackProgress(event);
@@ -92,14 +128,13 @@ public class PlayerBoundForegroundService extends Service {
         }
     }
 
-    private void startForeground(PlayerController.Event event) {
-        mArtist = event.getTrack().getArtist();
-        mTrack = event.getTrack().getTrackName();
+    private void startForeground(EventRequestModel event) {
+        mTrack = asTrackViewModel(event.getTrack());
         startForeground(FOREGROUND_ID, buildPlayNotification());
     }
 
-    private void onTrackProgress(PlayerController.Event event) {
-        mProgress = event.getProgress();
+    private void onTrackProgress(EventRequestModel event) {
+        mProgress = (int) (event.getProgress() * MAX_PROGRESS);
         getNotificationManager().notify(NOTIFICATION_ID, buildOnProgressNotification());
     }
 
@@ -119,8 +154,8 @@ public class PlayerBoundForegroundService extends Service {
         if (mNotificationBuilder == null) {
             mNotificationBuilder = new NotificationCompat.Builder(this, CHANNEL_ID);
             mNotificationBuilder
-                    .setContentTitle(mArtist)
-                    .setContentText(mTrack)
+                    .setContentTitle(mTrack.getArtist())
+                    .setContentText(mTrack.getTrackName())
                     .setProgress(MAX_PROGRESS, mProgress, false);
                     //.setDeleteIntent()
                     //.setContentIntent();
@@ -135,26 +170,25 @@ public class PlayerBoundForegroundService extends Service {
         return mNotificationManager;
     }
 
+    private Disposable subscribeOnPlayerEvents() {
+        return mEventsDisposable = playerController
+                .getPlayerEvents()
+                .subscribeOn(Schedulers.single())
+                .observeOn(Schedulers.single())
+                .subscribe(
+                        this::handleEvent,
+                        this::handleError
+                );
+    }
+
     private void handleError(Throwable e) {
-        e.printStackTrace(); //TODO: something smarter...
+        if (BuildConfig.DEBUG) {
+            Log.e(TAG, e.getMessage());
+        }
     }
 
-    private CompletableObserver completableHandler() {
-        return new CompletableObserver() {
-            @Override
-            public void onSubscribe(Disposable d) {
-
-            }
-
-            @Override
-            public void onComplete() {
-
-            }
-
-            @Override
-            public void onError(Throwable e) {
-                handleError(e);
-            }
-        };
+    private boolean isNew(TrackViewModel track) {
+        return mTrack == null || !track.getPreviewUrl().equals(mTrack.getPreviewUrl());
     }
+
 }

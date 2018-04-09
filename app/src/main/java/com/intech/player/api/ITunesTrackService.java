@@ -2,10 +2,11 @@ package com.intech.player.api;
 
 import android.support.annotation.NonNull;
 
-import com.intech.player.clean.entities.Artwork;
-import com.intech.player.clean.entities.Preview;
-import com.intech.player.clean.entities.Track;
-import com.intech.player.clean.interactors.boundaries.TrackService;
+import com.intech.player.clean.boundaries.TrackService;
+import com.intech.player.clean.boundaries.model.ArtworkRequestModel;
+import com.intech.player.clean.boundaries.model.PreviewRequestModel;
+import com.intech.player.clean.boundaries.model.TrackRequestModel;
+import com.intech.player.clean.boundaries.model.utils.ModelConverter;
 
 import io.reactivex.Observable;
 import io.reactivex.Single;
@@ -27,46 +28,26 @@ public class ITunesTrackService implements TrackService {
     }
 
     @Override
-    public Observable<Track> getTracks(@NonNull String keyword) {
+    public Observable<TrackRequestModel> getTracks(@NonNull String keyword) {
         return api
                 .getTrackList(keyword)
-                .flatMapObservable(ITunesTrackService::toTrackObservable);
+                .flatMapObservable(ModelConverter::asTrackObservable);
     }
 
     @Override
-    public Single<Artwork> getArtwork(@NonNull String url) {
+    public Single<ArtworkRequestModel> getArtwork(@NonNull String url) {
         return api
                 .getFile(url)
-                .map(body -> new Artwork(body.bytes()));
+                .map(body -> new ArtworkRequestModel(body.bytes()));
     }
 
     @Override
-    public Single<Preview> getPreview(@NonNull String url) {
-        final Preview.Type type = url.endsWith(VIDEO_SUFFIX)
-                ? Preview.Type.M4V
-                : Preview.Type.M4A;
+    public Single<PreviewRequestModel> getPreview(@NonNull String url) {
+        final PreviewRequestModel.Type type = url.endsWith(VIDEO_SUFFIX)
+                ? PreviewRequestModel.Type.M4V
+                : PreviewRequestModel.Type.M4A;
         return api
                 .getFile(url)
-                .map(body -> new Preview(type, body.bytes()));
-    }
-
-
-    private static Observable<Track> toTrackObservable(@NonNull final TrackListResponseModel model) {
-        return Observable.create(emitter -> {
-            if (!model.getResults().isEmpty()) {
-                for (Result result: model.getResults()) {
-                    emitter.onNext(toTrackEntity(result));
-                }
-                emitter.onComplete();
-            }
-        });
-    }
-
-    private static Track toTrackEntity(@NonNull Result result) {
-        return new Track()
-                .setArtist(result.getArtistName())
-                .setTrackName(result.getTrackName())
-                .setArtworkUrl(result.getArtworkUrl100())
-                .setPreviewUrl(result.getPreviewUrl());
+                .map(body -> new PreviewRequestModel(type, body.bytes()));
     }
 }

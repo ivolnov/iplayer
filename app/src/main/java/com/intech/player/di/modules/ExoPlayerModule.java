@@ -19,6 +19,8 @@ import com.google.android.exoplayer2.upstream.HttpDataSource;
 import com.google.android.exoplayer2.util.EventLogger;
 import com.google.android.exoplayer2.util.Util;
 import com.intech.player.BuildConfig;
+import com.intech.player.clean.boundaries.model.TrackRequestModel;
+import com.intech.player.controller.PlayerListener;
 
 import javax.inject.Named;
 
@@ -46,10 +48,15 @@ public class ExoPlayerModule {
     }
 
     @Provides
-    ExtractorMediaSource provideExtractorMediaSource(@Named("uri") String uri,
+    PlayerListener providePlayerListener(@Named("track") TrackRequestModel track) {
+        return new PlayerListener(track);
+    }
+
+    @Provides
+    ExtractorMediaSource provideExtractorMediaSource(@Named("track") TrackRequestModel track,
                                                      EventLogger logger,
                                                      ExtractorMediaSource.Factory factory) {
-        return factory.createMediaSource(Uri.parse(uri), new Handler(), logger);
+        return factory.createMediaSource(Uri.parse(track.getPreviewUrl()), new Handler(), logger);
     }
 
     @Provides

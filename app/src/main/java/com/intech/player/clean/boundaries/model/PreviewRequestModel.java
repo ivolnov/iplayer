@@ -1,12 +1,12 @@
-package com.intech.player.clean.entities;
+package com.intech.player.clean.boundaries.model;
 
 /**
- * An m4v video.
+ * A DTO passed to lower layers to represent preview entity's data..
  *
  * @author Ivan Volnov
  * @since 04.04.18
  */
-public class Preview {
+public class PreviewRequestModel {
 
     public enum Type {M4V, M4A}
 
@@ -14,7 +14,7 @@ public class Preview {
     private final byte[] bytes;
 
 
-    public Preview(Type type, byte[] bytes) {
+    public PreviewRequestModel(Type type, byte[] bytes) {
         this.type = type;
         this.bytes = bytes;
     }

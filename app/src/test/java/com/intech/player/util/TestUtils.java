@@ -1,8 +1,8 @@
 package com.intech.player.util;
 
-import com.intech.player.clean.entities.Artwork;
-import com.intech.player.clean.entities.Preview;
-import com.intech.player.clean.entities.Track;
+import com.intech.player.clean.boundaries.model.ArtworkRequestModel;
+import com.intech.player.clean.boundaries.model.PreviewRequestModel;
+import com.intech.player.clean.boundaries.model.TrackRequestModel;
 
 import io.reactivex.functions.Predicate;
 
@@ -25,11 +25,11 @@ public class TestUtils {
                 .contains("HTTP 400 Bad Request");
     }
 
-    public static Predicate<Artwork> equalTo(Artwork reference) {
+    public static Predicate<ArtworkRequestModel> equalTo(ArtworkRequestModel reference) {
         return artwork -> equalTo(reference.getBytes()).test(artwork.getBytes());
     }
 
-    public static Predicate<Preview> equalTo(Preview reference) {
+    public static Predicate<PreviewRequestModel> equalTo(PreviewRequestModel reference) {
         return preview -> equalTo(reference.getBytes()).test(preview.getBytes());
     }
 
@@ -47,8 +47,8 @@ public class TestUtils {
         };
     }
 
-    public static Track expectedTrack() {
-        return new Track()
+    public static TrackRequestModel expectedTrack() {
+        return new TrackRequestModel()
                 .setArtist(EXPECTED_ARTIST)
                 .setTrackName(EXPECTED_TRACK_NAME)
                 .setArtworkUrl(EXPECTED_ARTWORK_URL)

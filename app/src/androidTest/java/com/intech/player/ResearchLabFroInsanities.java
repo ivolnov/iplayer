@@ -32,7 +32,7 @@ import org.junit.runner.RunWith;
  * @since 04.04.18
  */
 @RunWith(AndroidJUnit4.class)
-public class CrazyResearchLabInstrumentedTest {
+public class ResearchLabFroInsanities {
 
     @Test
     public void name() {

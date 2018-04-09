@@ -1,8 +1,8 @@
 package com.intech.player.clean.interactors;
 
-import com.intech.player.clean.interactors.boundaries.PlayerController;
+import com.intech.player.clean.boundaries.PlayerController;
 
-import io.reactivex.CompletableSource;
+import io.reactivex.Completable;
 
 /**
  * Self explanatory.
@@ -17,7 +17,7 @@ public class PausePlayerUseCase {
         this.playerController = playerController;
     }
 
-    public CompletableSource execute() {
+    public Completable execute() {
         return playerController.pause();
     }
 }

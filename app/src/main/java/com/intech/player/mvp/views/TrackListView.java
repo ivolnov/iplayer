@@ -3,8 +3,7 @@ package com.intech.player.mvp.views;
 import android.support.annotation.NonNull;
 
 import com.arellomobile.mvp.MvpView;
-import com.intech.player.clean.entities.Artwork;
-import com.intech.player.clean.entities.Track;
+import com.intech.player.mvp.models.TrackViewModel;
 
 /**
  * Self explanatory.
@@ -13,7 +12,6 @@ import com.intech.player.clean.entities.Track;
  * @since 01.04.18
  */
 public interface TrackListView extends MvpView {
-    void addTrack(@NonNull Track track);
-    void addArtwork(@NonNull Artwork artwork);
+    void addTrack(@NonNull TrackViewModel track);
     void showError(@NonNull String message);
 }

@@ -2,6 +2,7 @@ package com.intech.player.di;
 
 import android.content.Context;
 
+import com.intech.player.clean.boundaries.model.TrackRequestModel;
 import com.intech.player.controller.ITunesPlayerController;
 import com.intech.player.di.modules.ExoPlayerModule;
 
@@ -16,8 +17,7 @@ import dagger.Component;
  * @author Ivan Volnov
  * @since 06.04.18
  */
-@UriScope
-@Component(modules = {ExoPlayerModule.class/*, ContextModule.class*/})
+@Component(modules = {ExoPlayerModule.class})
 public interface PlayerComponent {
 
     void inject(ITunesPlayerController playerController);
@@ -26,11 +26,9 @@ public interface PlayerComponent {
     interface Builder {
 
         @BindsInstance
-        Builder uri(@Named("uri") String uri);
+        Builder track(@Named("track") TrackRequestModel track);
         @BindsInstance
         Builder context(@Named("context") Context context);
-
-        /*Builder contextModule(ContextModule module);*/
 
         PlayerComponent build();
     }

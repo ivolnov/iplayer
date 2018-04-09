@@ -1,14 +1,14 @@
-package com.intech.player.clean.entities;
+package com.intech.player.clean.boundaries.model;
 
 import java.util.Objects;
 
 /**
- * A track business entity.
+ * A DTO passed to lower layers to represent track entity's data.
  *
  * @author Ivan Volnov
  * @since 03.04.18
  */
-public class Track {
+public class TrackRequestModel {
     private String artist;
     private String trackName;
     private String artworkUrl;
@@ -18,7 +18,7 @@ public class Track {
         return artist;
     }
 
-    public Track setArtist(String artist) {
+    public TrackRequestModel setArtist(String artist) {
         this.artist = artist;
         return this;
     }
@@ -27,7 +27,7 @@ public class Track {
         return trackName;
     }
 
-    public Track setTrackName(String trackName) {
+    public TrackRequestModel setTrackName(String trackName) {
         this.trackName = trackName;
         return this;
     }
@@ -36,7 +36,7 @@ public class Track {
         return artworkUrl;
     }
 
-    public Track setArtworkUrl(String artworkUrl) {
+    public TrackRequestModel setArtworkUrl(String artworkUrl) {
         this.artworkUrl = artworkUrl;
         return this;
     }
@@ -45,7 +45,7 @@ public class Track {
         return previewUrl;
     }
 
-    public Track setPreviewUrl(String previewUrl) {
+    public TrackRequestModel setPreviewUrl(String previewUrl) {
         this.previewUrl = previewUrl;
         return this;
     }
@@ -54,7 +54,7 @@ public class Track {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Track track = (Track) o;
+        TrackRequestModel track = (TrackRequestModel) o;
         return Objects.equals(artist, track.artist) &&
                 Objects.equals(trackName, track.trackName) &&
                 Objects.equals(artworkUrl, track.artworkUrl) &&

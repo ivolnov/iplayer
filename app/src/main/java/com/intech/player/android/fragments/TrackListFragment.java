@@ -1,8 +1,10 @@
 package com.intech.player.android.fragments;
 
-import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.Snackbar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
@@ -16,11 +18,14 @@ import android.view.ViewGroup;
 import com.arellomobile.mvp.MvpAppCompatFragment;
 import com.arellomobile.mvp.presenter.InjectPresenter;
 import com.intech.player.R;
+import com.intech.player.android.activities.PlayerActivity;
 import com.intech.player.android.adapters.TrackListRecyclerViewAdapter;
-import com.intech.player.clean.entities.Artwork;
-import com.intech.player.clean.entities.Track;
+import com.intech.player.mvp.models.TrackViewModel;
 import com.intech.player.mvp.presenters.TrackListPresenter;
 import com.intech.player.mvp.views.TrackListView;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
 
 /**
  * A {@link TrackListView} implementation.
@@ -31,38 +36,44 @@ import com.intech.player.mvp.views.TrackListView;
 public class TrackListFragment extends MvpAppCompatFragment
         implements TrackListView, TrackListRecyclerViewAdapter.ViewHolder.IViewHolderListener {
 
+    public static final String EXTRA_SELECTED_TRACK = "com.intech.player.EXTRA_SELECTED_TRACK";
+
     @InjectPresenter
-    TrackListPresenter mTrackListPresenter;
+    TrackListPresenter trackListPresenter;
+
+    @BindView(R.id.list)
+    RecyclerView mRecyclerView;
+
+    private CoordinatorLayout mCoordinatorLayout;
+    private TrackListRecyclerViewAdapter mAdapter;
 
     public TrackListFragment() {}
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater,
                              ViewGroup container,
                              Bundle savedInstanceState) {
-        final View view = inflater
+        mCoordinatorLayout = (CoordinatorLayout) inflater
                 .inflate(R.layout.track_item_list, container, false);
 
-        if (view instanceof RecyclerView) {
-            final Context context = view.getContext();
-            final RecyclerView recyclerView = (RecyclerView) view;
-            recyclerView.setLayoutManager(new LinearLayoutManager(context));
-            recyclerView.setAdapter(new TrackListRecyclerViewAdapter(this));
-        }
+        ButterKnife.bind(this, mCoordinatorLayout);
 
-        return view;
+        mAdapter = new TrackListRecyclerViewAdapter(this);
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        mRecyclerView.setAdapter(mAdapter);
+
+        return mCoordinatorLayout;
     }
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.menu_track_list, menu);
-        final MenuItem searchItem = menu.findItem(R.id.actions_search); //TODO: butterknife
+        final MenuItem searchItem = menu.findItem(R.id.actions_search);
 
         if (searchItem != null) {
             final SearchView searchView = (SearchView) searchItem.getActionView();
@@ -73,41 +84,35 @@ public class TrackListFragment extends MvpAppCompatFragment
     }
 
     @Override
-    public void addTrack(@NonNull Track track) {
-        //TODO: add track to view holder and notify it
-    }
-
-    @Override
-    public void addArtwork(@NonNull Artwork artwork) {
-        //TODO: add track to view holder and notify it
+    public void addTrack(@NonNull TrackViewModel track) {
+        mAdapter.addTrack(track);
     }
 
     @Override
     public void showError(@NonNull String message) {
-        //TODO: show a toast?
+        Snackbar
+                .make(mCoordinatorLayout, message, Snackbar.LENGTH_LONG)
+                .show();
     }
 
     @Override
-    public void onItemClicked(Track track) {
-        //TODO: start player activity
-    }
-
-    @Override
-    public void onLoadArtworks(String url) {
-        mTrackListPresenter.loadArtworks(url);
+    public void onItemClicked(TrackViewModel track) {
+        final Intent intent = new Intent(getActivity(), PlayerActivity.class);
+        intent.putExtra(EXTRA_SELECTED_TRACK, track);
+        startActivity(intent);
     }
 
     private SearchView.OnQueryTextListener getSearchTextListener() {
         return  new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                mTrackListPresenter.onEnterQuery(query);
+                trackListPresenter.onEnterQuery(query);
                 return false;
             }
 
             @Override
             public boolean onQueryTextChange(String query) {
-                //mTrackListPresenter.onEnterQuery(query);
+                //trackListPresenter.onEnterQuery(query);
                 return false;
             }
         };

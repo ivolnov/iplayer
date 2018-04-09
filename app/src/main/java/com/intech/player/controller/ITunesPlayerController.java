@@ -1,17 +1,23 @@
 package com.intech.player.controller;
 
 import android.support.annotation.VisibleForTesting;
+import android.view.SurfaceView;
 
 import com.google.android.exoplayer2.SimpleExoPlayer;
-import com.intech.player.App;
-import com.intech.player.clean.interactors.boundaries.PlayerController;
-import com.intech.player.di.DaggerPlayerComponent;
+import com.intech.player.clean.boundaries.PlayerController;
+import com.intech.player.clean.boundaries.model.EventRequestModel;
+import com.intech.player.controller.utils.PlayerPositionCalculator;
+
+import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 
-import io.reactivex.CompletableSource;
+import io.reactivex.Completable;
+import io.reactivex.CompletableObserver;
 import io.reactivex.Observable;
 import io.reactivex.Observer;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
 
 /**
  * Self explanatory.
@@ -21,51 +27,65 @@ import io.reactivex.Observer;
  */
 public class ITunesPlayerController implements PlayerController {
 
+    private static final TimeUnit POLL_PROGRESS_UNIT = TimeUnit.MILLISECONDS;
+    private static final int POLL_PROGRESS_EACH = 200;
+    private static final int POLL_PROGRESS_AFTER = 0;
+
     @Inject
     SimpleExoPlayer player;
 
-    private Observer<? super Event> mObserver;
+    @Inject
+    PlayerListener listener;
+
+    private Disposable progressDisposable;
 
     @Override
-    public CompletableSource init(String url) {
-        return completableSourceFrom(() -> {
-            DaggerPlayerComponent
-                    .builder()
-                    .context(App.getAppComponent().getContext())
-                    .uri(url)
-                    .build()
-                    .inject(this);
+    public Completable start() {
+        return completableFrom(() ->  player.setPlayWhenReady(true));
+    }
+
+    @Override
+    public Completable seek(long position) {
+        return completableFrom(() ->  player.seekTo(position));
+    }
+
+    @Override
+    public Completable pause() {
+        return completableFrom(() ->  player.setPlayWhenReady(false));
+    }
+
+    @Override
+    public Completable stop() {
+        clearState();
+        return completableFrom(() ->  player.release());
+    }
+
+    @Override
+    public Observable<EventRequestModel> getPlayerEvents() {
+        return new Observable<EventRequestModel>() {
+            @Override
+            protected void subscribeActual(Observer<? super EventRequestModel> observer) {
+                listener.addObserver(observer);
+                player.addListener(listener);
+                observer.onNext(player.getPlayWhenReady()
+                        ? listener.getStartEvent()
+                        : listener.getPauseEvent());
+            }
+        }
+        .doOnSubscribe(this::startProgressPolling)
+        .doOnDispose(()-> {
+            stopProgressPolling();
+            listener.removeObserver();
+            player.removeListener(listener);
         });
     }
 
-    @Override
-    public CompletableSource start() {
-        return completableSourceFrom(() ->  player.setPlayWhenReady(true));
+    public void setVideoSurface(SurfaceView view) {
+        player.setVideoSurfaceView(view);
     }
 
-    @Override
-    public CompletableSource seek(long position) {
-        return completableSourceFrom(() ->  player.seekTo(position));
-    }
-
-    @Override
-    public CompletableSource pause() {
-        return completableSourceFrom(() ->  player.setPlayWhenReady(false));
-    }
-
-    @Override
-    public CompletableSource stop() {
-        return completableSourceFrom(() ->  player.release());
-    }
-
-    @Override
-    public Observable<Event> getPlayerEvents() {
-        return new Observable<Event>() {
-            @Override
-            protected void subscribeActual(Observer<? super Event> observer) {
-                mObserver = observer;
-            }
-        }.doOnDispose(()-> mObserver = null);
+    public void clearVideoSurface() {
+        player.clearVideoSurface();
     }
 
     @VisibleForTesting
@@ -73,14 +93,40 @@ public class ITunesPlayerController implements PlayerController {
         return player;
     }
 
-    private CompletableSource completableSourceFrom(Runnable todo) {
-        return subscriber -> {
-            try {
-                todo.run();
-                subscriber.onComplete();
-            } catch (Throwable e) {
-                subscriber.onError(e);
+    private Completable completableFrom(Runnable todo) {
+        return new Completable() {
+            @Override
+            protected void subscribeActual(CompletableObserver s) {
+                try {
+                    todo.run();
+                    s.onComplete();
+                } catch (Throwable e) {
+                    s.onError(e);
+                }
             }
         };
+    }
+
+    private void startProgressPolling(Disposable noop) {
+        progressDisposable = Observable
+                .interval(
+                        POLL_PROGRESS_AFTER,
+                        POLL_PROGRESS_EACH,
+                        POLL_PROGRESS_UNIT,
+                        Schedulers.computation())
+                .subscribeOn(Schedulers.single())
+                .observeOn(Schedulers.single())
+                .subscribe(
+                        s -> listener.onProgressChanged(PlayerPositionCalculator.calculate(player))
+                );
+    }
+
+    private void stopProgressPolling() {
+        progressDisposable.dispose();
+    }
+
+    private void clearState() {
+        player = null;
+        listener = null;
     }
 }

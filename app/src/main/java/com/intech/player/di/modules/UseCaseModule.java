@@ -1,7 +1,9 @@
 package com.intech.player.di.modules;
 
 import com.intech.player.api.ITunesTrackService;
+import com.intech.player.clean.interactors.GetPlayerEventsUseCase;
 import com.intech.player.clean.interactors.GetTrackListUseCase;
+import com.intech.player.clean.interactors.PausePlayerUseCase;
 import com.intech.player.clean.interactors.StartPlayerUseCase;
 import com.intech.player.controller.ITunesPlayerController;
 
@@ -22,7 +24,17 @@ public class UseCaseModule {
     }
 
     @Provides
-    StartPlayerUseCase provideStartPlayerUseCase(ITunesPlayerController player) {
-        return new StartPlayerUseCase(player);
+    StartPlayerUseCase provideStartPlayerUseCase(ITunesPlayerController controller) {
+        return new StartPlayerUseCase(controller);
+    }
+
+    @Provides
+    PausePlayerUseCase providePausePlayerUseCase(ITunesPlayerController controller) {
+        return new PausePlayerUseCase(controller);
+    }
+
+    @Provides
+    GetPlayerEventsUseCase provideGetPlayerEventsUseCase(ITunesPlayerController controller) {
+        return new GetPlayerEventsUseCase(controller);
     }
 }

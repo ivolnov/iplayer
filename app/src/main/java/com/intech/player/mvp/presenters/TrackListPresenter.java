@@ -6,11 +6,16 @@ import com.arellomobile.mvp.InjectViewState;
 import com.arellomobile.mvp.MvpPresenter;
 import com.intech.player.App;
 import com.intech.player.clean.interactors.GetTrackListUseCase;
+import com.intech.player.mvp.presenters.utils.UserMessageCompiler;
 import com.intech.player.mvp.views.TrackListView;
 
 import javax.inject.Inject;
 
+import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
+
+import static com.intech.player.mvp.models.utils.ModelConverter.asTrackViewModel;
 
 /**
  * Self explanatory.
@@ -30,24 +35,18 @@ public class TrackListPresenter extends MvpPresenter<TrackListView> {
         App.getAppComponent().inject(this);
     }
 
-    @Override
-    protected void onFirstViewAttach() {
-        super.onFirstViewAttach();
-    }
-
     public void onEnterQuery(@NonNull String query) {
         dispose();
+
         mTrackListDisposable = getTrackListUseCase
-                .getTracks(query)
+                .execute(query)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
-                        track -> getViewState().addTrack(track),
+                        track -> getViewState().addTrack(asTrackViewModel(track)),
                         error -> getViewState().showError(getMessage(error))
                 );
 
-    }
-
-    public void loadArtworks(String url) {
-        //TODO: observe some use case... getViewState().addArtwork();
     }
 
     private void dispose() {
@@ -57,7 +56,6 @@ public class TrackListPresenter extends MvpPresenter<TrackListView> {
     }
 
     private String getMessage(Throwable error) {
-        //TODO: compile an error
-        return String.format("Oops...%s", error.getMessage());
+        return UserMessageCompiler.from(error);
     }
 }
