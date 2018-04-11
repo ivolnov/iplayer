@@ -1,12 +1,15 @@
 package com.intech.player.android.services;
 
 import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Binder;
+import android.os.Build;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
-import android.support.v4.app.NotificationManagerCompat;
 import android.util.Log;
 import android.view.SurfaceView;
 
@@ -41,6 +44,7 @@ public class PlayerBoundForegroundService extends android.app.Service {
     private static final String TAG = PlayerBoundForegroundService.class.getSimpleName();
 
     public static final String CHANNEL_ID = "IPlayer";
+    public static final String CHANNEL_NAME = "IPlayer notifications when in background.";
 
     public static final int FOREGROUND_ID = 1;
     public static final int NOTIFICATION_ID = 1;
@@ -50,12 +54,12 @@ public class PlayerBoundForegroundService extends android.app.Service {
     public enum PlayerState {Playing, Paused}
 
     public interface SurfaceConsumer {
-        void setSurfaceView(SurfaceView view);;
+        void setSurfaceView(SurfaceView view);
     }
 
     private PlayerState mState = Paused;
     private NotificationCompat.Builder mNotificationBuilder;
-    private NotificationManagerCompat mNotificationManager;
+    private NotificationManager mNotificationManager;
 
     private int mProgress;
     private TrackViewModel mTrack;
@@ -77,11 +81,17 @@ public class PlayerBoundForegroundService extends android.app.Service {
         App.getAppComponent().inject(this);
     }
 
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        createNotificationChannel();
+    }
+
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
         final TrackViewModel track = intent.getParcelableExtra(EXTRA_TRACK);
-        mEventsDisposable = subscribeOnPlayerEvents();
+
         if (isNew(track)) {
             stopForeground(true);
             DaggerPlayerComponent
@@ -90,6 +100,8 @@ public class PlayerBoundForegroundService extends android.app.Service {
                     .track(asTrackRequestModel(track))
                     .build()
                     .inject(playerController);
+
+            mEventsDisposable = subscribeOnPlayerEvents();
         }
 
         return new LocalBinder();
@@ -112,6 +124,11 @@ public class PlayerBoundForegroundService extends android.app.Service {
         return false;
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+    }
+
     private void handleEvent(EventRequestModel event) {
         switch (event.getType()) {
             case Start:
@@ -128,14 +145,36 @@ public class PlayerBoundForegroundService extends android.app.Service {
         }
     }
 
-    private void startForeground(EventRequestModel event) {
-        mTrack = asTrackViewModel(event.getTrack());
-        startForeground(FOREGROUND_ID, buildPlayNotification());
+    private Disposable subscribeOnPlayerEvents() {
+        return mEventsDisposable = playerController
+                .getPlayerEvents()
+                .subscribeOn(Schedulers.single())
+                .observeOn(Schedulers.single())
+                .subscribe(
+                        this::handleEvent,
+                        this::handleError
+                );
     }
+
+    private void handleError(Throwable e) {
+        if (BuildConfig.DEBUG) {
+            Log.e(TAG, e.getMessage());
+        }
+    }
+
+    private boolean isNew(TrackViewModel track) {
+        return mTrack == null || !track.getPreviewUrl().equals(mTrack.getPreviewUrl());
+    }
+
 
     private void onTrackProgress(EventRequestModel event) {
         mProgress = (int) (event.getProgress() * MAX_PROGRESS);
         getNotificationManager().notify(NOTIFICATION_ID, buildOnProgressNotification());
+    }
+
+    private void startForeground(EventRequestModel event) {
+        mTrack = asTrackViewModel(event.getTrack());
+        startForeground(FOREGROUND_ID, buildPlayNotification());
     }
 
     private Notification buildPlayNotification() {
@@ -163,32 +202,23 @@ public class PlayerBoundForegroundService extends android.app.Service {
         return mNotificationBuilder;
     }
 
-    private NotificationManagerCompat getNotificationManager() {
+    private NotificationManager getNotificationManager() {
         if (mNotificationManager == null) {
-            mNotificationManager = NotificationManagerCompat.from(this);
+            mNotificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         }
         return mNotificationManager;
     }
 
-    private Disposable subscribeOnPlayerEvents() {
-        return mEventsDisposable = playerController
-                .getPlayerEvents()
-                .subscribeOn(Schedulers.single())
-                .observeOn(Schedulers.single())
-                .subscribe(
-                        this::handleEvent,
-                        this::handleError
-                );
-    }
-
-    private void handleError(Throwable e) {
-        if (BuildConfig.DEBUG) {
-            Log.e(TAG, e.getMessage());
+    private void createNotificationChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            final NotificationChannel notificationChannel = new NotificationChannel(
+                    CHANNEL_ID,
+                    CHANNEL_NAME,
+                    NotificationManager.IMPORTANCE_HIGH);
+            notificationChannel.enableLights(true);
+            notificationChannel.setLightColor(Color.BLUE);
+            getNotificationManager()
+                    .createNotificationChannel(notificationChannel);
         }
     }
-
-    private boolean isNew(TrackViewModel track) {
-        return mTrack == null || !track.getPreviewUrl().equals(mTrack.getPreviewUrl());
-    }
-
 }

@@ -67,6 +67,9 @@ public class PlayerFragment extends MvpAppCompatFragment implements PlayerView {
         public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
             final PlayerBoundForegroundService.SurfaceConsumer surfaceConsumer
                     = (PlayerBoundForegroundService.SurfaceConsumer) iBinder;
+
+            //playerPresenter.listenToPlayer(true);
+
             if (playerPresenter.isVideo()) {
                 surface.setVisibility(View.VISIBLE);
                 artwork.setVisibility(View.GONE);
@@ -137,7 +140,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements PlayerView {
     public void onResume() {
         super.onResume();
         button.setOnClickListener(view -> playerPresenter.buttonCLicked());
-        playerPresenter.listenToPlayer(true);
+        //playerPresenter.listenToPlayer(true);
     }
 
 
@@ -145,7 +148,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements PlayerView {
     public void onPause() {
         super.onPause();
         button.setOnClickListener(null);
-        playerPresenter.listenToPlayer(false);
+        //playerPresenter.listenToPlayer(false);
     }
 
 
