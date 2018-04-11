@@ -9,6 +9,7 @@ import android.os.Binder;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.media.session.MediaSessionCompat;
 import android.util.Log;
 import android.view.SurfaceView;
 
@@ -176,14 +177,15 @@ public class PlayerBoundForegroundService extends android.app.Service {
     private void handleEvent(EventRequestModel event) {
         switch (event.getType()) {
             case Start:
-                startForeground();
+                onStartNotification();
                 mState = Playing;
                 break;
             case Pause:
+                onPauseNotification();
                 mState = Paused;
                 break;
             case Progress:
-                onTrackProgress(event);
+                onProgressNotification(event);
                 break;
         }
     }
@@ -194,18 +196,32 @@ public class PlayerBoundForegroundService extends android.app.Service {
         }
     }
 
-    private void onTrackProgress(EventRequestModel event) {
-        mProgress = (int) (event.getProgress() * MAX_PROGRESS);
-        getNotificationManager().notify(NOTIFICATION_ID, buildOnProgressNotification());
+    private void startForeground() {
+        startForeground(FOREGROUND_ID, buildPauseNotification());
     }
 
-    private void startForeground() {
-        startForeground(FOREGROUND_ID, buildPlayNotification());
+    private void onStartNotification() {
+        getNotificationManager().notify(NOTIFICATION_ID, buildPlayNotification());
+    }
+
+    private void onPauseNotification() {
+        getNotificationManager().notify(NOTIFICATION_ID, buildPauseNotification());
+    }
+
+    private void onProgressNotification(EventRequestModel event) {
+        mProgress = (int) (event.getProgress() * MAX_PROGRESS);
+        getNotificationManager().notify(NOTIFICATION_ID, buildOnProgressNotification());
     }
 
     private Notification buildPlayNotification() {
         return getNotificationBuilder()
                 .setSmallIcon(android.R.drawable.ic_media_play)
+                .build();
+    }
+
+    private Notification buildPauseNotification() {
+        return getNotificationBuilder()
+                .setSmallIcon(android.R.drawable.ic_media_pause)
                 .build();
     }
 
@@ -217,7 +233,11 @@ public class PlayerBoundForegroundService extends android.app.Service {
 
     private NotificationCompat.Builder getNotificationBuilder() {
         if (mNotificationBuilder == null) {
-            mNotificationBuilder = new NotificationCompat.Builder(this, CHANNEL_ID);
+            mNotificationBuilder = new NotificationCompat.Builder(this, CHANNEL_ID)
+                    .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+					.setStyle(new android.support.v4.media.app.NotificationCompat.MediaStyle()
+					.setMediaSession(new MediaSessionCompat(this, CHANNEL_NAME).getSessionToken()));
+					//.setShowActionsInCompactView(0, 1));
 /*            mNotificationBuilder
                     .setDeleteIntent()
                     .setContentIntent();*/
@@ -243,6 +263,7 @@ public class PlayerBoundForegroundService extends android.app.Service {
                     CHANNEL_ID,
                     CHANNEL_NAME,
                     NotificationManager.IMPORTANCE_LOW);
+            notificationChannel.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
             notificationChannel.enableLights(true);
             notificationChannel.setLightColor(Color.BLUE);
             getNotificationManager()
