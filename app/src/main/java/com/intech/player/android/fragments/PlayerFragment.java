@@ -34,6 +34,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 import static com.intech.player.android.fragments.TrackListFragment.EXTRA_SELECTED_TRACK;
+import static com.intech.player.android.utils.AndroidUtils.oreo;
 
 /**
  * A {@link PlayerView} implementation.
@@ -65,15 +66,17 @@ public class PlayerFragment extends MvpAppCompatFragment implements PlayerView {
     private ServiceConnection mConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
-            final PlayerBoundForegroundService.SurfaceConsumer surfaceConsumer
-                    = (PlayerBoundForegroundService.SurfaceConsumer) iBinder;
+            final PlayerBoundForegroundService.DependenciesConsumer dependenciesConsumer
+                    = (PlayerBoundForegroundService.DependenciesConsumer) iBinder;
 
             //playerPresenter.listenToPlayer(true);
+
+            dependenciesConsumer.setTrack(playerPresenter.getTrack());
 
             if (playerPresenter.isVideo()) {
                 surface.setVisibility(View.VISIBLE);
                 artwork.setVisibility(View.GONE);
-                surfaceConsumer.setSurfaceView(surface);
+                dependenciesConsumer.setSurfaceView(surface);
             }
         }
 
@@ -130,9 +133,14 @@ public class PlayerFragment extends MvpAppCompatFragment implements PlayerView {
         }
 
         if (playerPresenter.hasTrack()) {
-            final Intent intent = new Intent(getActivity(), PlayerBoundForegroundService.class)
-                    .putExtra(EXTRA_TRACK, playerPresenter.getTrack());
-            getActivity().bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+			if (oreo()) {
+				getActivity()
+                        .startForegroundService(new Intent(getContext(), PlayerBoundForegroundService.class));
+			} else {
+				getActivity()
+                        .startService(new Intent(getContext(), PlayerBoundForegroundService.class));
+			}
+            getActivity().bindService(serviceIntent(), mConnection, Context.BIND_IMPORTANT);
         }
     }
 
@@ -185,5 +193,10 @@ public class PlayerFragment extends MvpAppCompatFragment implements PlayerView {
     @Override
     public void setProgress(double progress) {
         progressBar.setProgress((int)(progress * progressBar.getMax()));
+    }
+
+    private Intent serviceIntent() {
+        return new Intent(getActivity(), PlayerBoundForegroundService.class)
+                .putExtra(EXTRA_TRACK, playerPresenter.getTrack());
     }
 }

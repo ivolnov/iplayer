@@ -3,6 +3,7 @@ package com.intech.player.android.utils;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.Build;
 
 /**
  * Self explanatory.
@@ -10,7 +11,7 @@ import android.net.NetworkInfo;
  * @author Ivan Volnov
  * @since 09.04.18
  */
-public class NetworkUtils {
+public class AndroidUtils {
 
     public static boolean isNetworkAvailable(Context context) {
         final ConnectivityManager cm = (ConnectivityManager)
@@ -22,5 +23,9 @@ public class NetworkUtils {
         }
 
         return false;
+    }
+
+    public static boolean oreo() {
+        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.O;
     }
 }

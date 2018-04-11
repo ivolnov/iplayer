@@ -2,6 +2,7 @@ package com.intech.player.di.modules;
 
 import android.content.Context;
 
+import com.intech.player.BuildConfig;
 import com.squareup.picasso.OkHttp3Downloader;
 import com.squareup.picasso.Picasso;
 
@@ -22,8 +23,12 @@ public class PicassoModule {
     @Provides
     @Reusable
     Picasso providePicasso(OkHttpClient client, Context context) {
-        return new Picasso.Builder(context)
+        final Picasso picasso = new Picasso.Builder(context)
                 .downloader(new OkHttp3Downloader(client))
                 .build();
+        if (BuildConfig.DEBUG) {
+            picasso.setLoggingEnabled(true);
+        }
+        return picasso;
     }
 }

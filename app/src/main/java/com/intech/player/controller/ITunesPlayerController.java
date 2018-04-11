@@ -56,8 +56,7 @@ public class ITunesPlayerController implements PlayerController {
 
     @Override
     public Completable stop() {
-        clearState();
-        return completableFrom(() ->  player.release());
+        return completableFrom(this::clearState);
     }
 
     @Override
@@ -126,7 +125,11 @@ public class ITunesPlayerController implements PlayerController {
     }
 
     private void clearState() {
-        player = null;
-        listener = null;
+        if (player != null) {
+            player.release();
+        }
+        if (listener != null) {
+			listener.removeObserver();
+		}
     }
 }

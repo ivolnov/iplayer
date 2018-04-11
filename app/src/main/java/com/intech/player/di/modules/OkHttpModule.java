@@ -16,7 +16,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.logging.HttpLoggingInterceptor;
 
-import static com.intech.player.android.utils.NetworkUtils.isNetworkAvailable;
+import static com.intech.player.android.utils.AndroidUtils.isNetworkAvailable;
 
 /**
  * Self explanatory.
