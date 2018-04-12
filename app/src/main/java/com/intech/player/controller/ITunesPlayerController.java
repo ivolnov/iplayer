@@ -71,6 +71,8 @@ public class ITunesPlayerController implements PlayerController {
                         : listener.getPauseEvent());
             }
         }
+        .subscribeOn(Schedulers.single())
+        .observeOn(Schedulers.single())
         .doOnSubscribe(this::startProgressPolling)
         .doOnDispose(()-> {
             stopProgressPolling();

@@ -24,7 +24,6 @@ import com.intech.player.mvp.presenters.utils.UserMessageCompiler;
 import javax.inject.Inject;
 
 import io.reactivex.disposables.Disposable;
-import io.reactivex.schedulers.Schedulers;
 
 import static com.intech.player.android.fragments.PlayerFragment.EXTRA_TRACK;
 import static com.intech.player.android.services.PlayerBoundForegroundService.PlayerState.Paused;
@@ -166,8 +165,6 @@ public class PlayerBoundForegroundService extends android.app.Service {
     private Disposable subscribeOnPlayerEvents() {
         return mEventsDisposable = playerController
                 .getPlayerEvents()
-                .subscribeOn(Schedulers.single())
-                .observeOn(Schedulers.single())
                 .subscribe(
                         this::handleEvent,
                         this::handleError

@@ -25,10 +25,9 @@ public class PlayerPositionCalculator {
      */
     public static double calculate(@NonNull ExoPlayer player) {
 
-        long currentWindowTimeBarOffsetUs = 0;
-        long durationUs = 0;
-        long position;
-        long duration;
+        long currentWindowTimeBarOffsetUs = 0L;
+        long durationUs = 0L;
+
 
         for (int i=0; i < player.getCurrentTimeline().getWindowCount(); i ++) {
             final Timeline.Window window = new Timeline.Window();
@@ -41,9 +40,9 @@ public class PlayerPositionCalculator {
             durationUs += window.durationUs;
         }
 
-        duration = C.usToMs(durationUs);
-        position = C.usToMs(currentWindowTimeBarOffsetUs);
+        long duration = C.usToMs(durationUs);
+        Long position = C.usToMs(currentWindowTimeBarOffsetUs) + player.getCurrentPosition();
 
-        return position / duration;
+        return position.doubleValue() / duration;
     }
 }
