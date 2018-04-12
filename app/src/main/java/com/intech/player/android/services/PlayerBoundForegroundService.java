@@ -3,18 +3,22 @@ package com.intech.player.android.services;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.app.Service;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Binder;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
-import android.support.v4.media.session.MediaSessionCompat;
 import android.util.Log;
 import android.view.SurfaceView;
 
 import com.intech.player.App;
 import com.intech.player.BuildConfig;
+import com.intech.player.R;
+import com.intech.player.android.activities.PlayerActivity;
+import com.intech.player.android.activities.TrackListActivity;
 import com.intech.player.clean.boundaries.model.EventRequestModel;
 import com.intech.player.controller.ITunesPlayerController;
 import com.intech.player.di.DaggerPlayerComponent;
@@ -25,7 +29,9 @@ import javax.inject.Inject;
 
 import io.reactivex.disposables.Disposable;
 
+import static com.intech.player.App.INVALID_ID;
 import static com.intech.player.android.fragments.PlayerFragment.EXTRA_TRACK;
+import static com.intech.player.android.fragments.TrackListFragment.EXTRA_SELECTED_TRACK;
 import static com.intech.player.android.services.PlayerBoundForegroundService.PlayerState.Paused;
 import static com.intech.player.android.services.PlayerBoundForegroundService.PlayerState.Playing;
 import static com.intech.player.android.utils.AndroidUtils.oreo;
@@ -41,7 +47,7 @@ import static com.intech.player.mvp.models.utils.ModelConverter.asTrackRequestMo
  * @author Ivan Volnov
  * @since 01.04.18
  */
-public class PlayerBoundForegroundService extends android.app.Service {
+public class PlayerBoundForegroundService extends Service {
 
     private static final String TAG = PlayerBoundForegroundService.class.getSimpleName();
 
@@ -137,11 +143,11 @@ public class PlayerBoundForegroundService extends android.app.Service {
             mTrack = track;
             mState = Paused;
 
-            stopPlayer();
-            initPlayer(track);
-
             stopForeground(true);
             startForeground();
+
+            stopPlayer();
+            initPlayer(track);
 
             mEventsDisposable = subscribeOnPlayerEvents();
         }
@@ -224,7 +230,7 @@ public class PlayerBoundForegroundService extends android.app.Service {
 
     private Notification buildOnProgressNotification() {
         return getNotificationBuilder()
-                .setProgress(MAX_PROGRESS, mProgress, true)
+                .setProgress(MAX_PROGRESS, mProgress, false)
                 .build();
     }
 
@@ -232,12 +238,7 @@ public class PlayerBoundForegroundService extends android.app.Service {
         if (mNotificationBuilder == null) {
             mNotificationBuilder = new NotificationCompat.Builder(this, CHANNEL_ID)
                     .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-					.setStyle(new android.support.v4.media.app.NotificationCompat.MediaStyle()
-					.setMediaSession(new MediaSessionCompat(this, CHANNEL_NAME).getSessionToken()));
-					//.setShowActionsInCompactView(0, 1));
-/*            mNotificationBuilder
-                    .setDeleteIntent()
-                    .setContentIntent();*/
+					.setContentIntent(contentIntent());
         }
         mNotificationBuilder
                 .setContentTitle(mTrack.getArtist())
@@ -258,7 +259,7 @@ public class PlayerBoundForegroundService extends android.app.Service {
         if (oreo()) {
             final NotificationChannel notificationChannel = new NotificationChannel(
                     CHANNEL_ID,
-                    CHANNEL_NAME,
+                    getString(R.string.player_notifications_channel),
                     NotificationManager.IMPORTANCE_LOW);
             notificationChannel.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
             notificationChannel.enableLights(true);
@@ -271,4 +272,17 @@ public class PlayerBoundForegroundService extends android.app.Service {
     private boolean isNew(TrackViewModel track) {
         return mTrack == null || track == null || !track.getPreviewUrl().equals(mTrack.getPreviewUrl());
     }
+
+    private PendingIntent contentIntent() {
+		final Intent main = new Intent(this, TrackListActivity.class);
+    	final Intent player = new Intent(this, PlayerActivity.class)
+				.putExtra(EXTRA_SELECTED_TRACK, mTrack);
+
+		return PendingIntent
+				.getActivities(
+						this,
+						INVALID_ID,
+						new Intent[] {main, player},
+						PendingIntent.FLAG_CANCEL_CURRENT);
+	}
 }

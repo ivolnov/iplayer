@@ -15,6 +15,9 @@ import com.intech.player.di.modules.ContextModule;
  * @since 01.04.18
  */
 public class App extends Application {
+
+    public static final int INVALID_ID = -1;
+
     private static AppComponent sAppComponent;
 
     @Override
