@@ -69,8 +69,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements PlayerView {
             final PlayerBoundForegroundService.DependenciesConsumer dependenciesConsumer
                     = (PlayerBoundForegroundService.DependenciesConsumer) iBinder;
 
-            //playerPresenter.listenToPlayer(true);
-
+            playerPresenter.listenToPlayer(true);
             dependenciesConsumer.setTrack(playerPresenter.getTrack());
 
             if (playerPresenter.isVideo()) {
@@ -148,7 +147,6 @@ public class PlayerFragment extends MvpAppCompatFragment implements PlayerView {
     public void onResume() {
         super.onResume();
         button.setOnClickListener(view -> playerPresenter.buttonCLicked());
-        //playerPresenter.listenToPlayer(true);
     }
 
 
@@ -156,13 +154,13 @@ public class PlayerFragment extends MvpAppCompatFragment implements PlayerView {
     public void onPause() {
         super.onPause();
         button.setOnClickListener(null);
-        //playerPresenter.listenToPlayer(false);
     }
 
 
     @Override
     public void onStop() {
         super.onStop();
+        playerPresenter.listenToPlayer(false);
         if (getActivity() != null) {
             getActivity().unbindService(mConnection);
         }

@@ -1,10 +1,10 @@
 package com.intech.player.controller.utils;
 
-import android.support.annotation.NonNull;
-
 import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.Timeline;
+
+import io.reactivex.annotations.NonNull;
 
 /**
  * A simplified version of:

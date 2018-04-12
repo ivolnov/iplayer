@@ -52,7 +52,6 @@ public class PlayerBoundForegroundService extends Service {
     private static final String TAG = PlayerBoundForegroundService.class.getSimpleName();
 
     public static final String CHANNEL_ID = "IPlayer";
-    public static final String CHANNEL_NAME = "IPlayer background notifications."; //TODO: i11n
 
     public static final int FOREGROUND_ID = 1;
     public static final int NOTIFICATION_ID = 1;

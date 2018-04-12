@@ -9,6 +9,8 @@ import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
 import com.intech.player.clean.boundaries.model.EventRequestModel;
 import com.intech.player.clean.boundaries.model.TrackRequestModel;
 
+import java.util.HashMap;
+
 import io.reactivex.Observer;
 
 import static com.intech.player.clean.boundaries.model.utils.ModelConverter.asPauseEvent;
@@ -23,30 +25,30 @@ import static com.intech.player.clean.boundaries.model.utils.ModelConverter.asSt
  */
 public class PlayerListener implements Player.EventListener {
 
-    private Observer<? super EventRequestModel> observer;
+    private HashMap<String, Observer<? super EventRequestModel>> observers;
     private final EventRequestModel startEvent;
     private final EventRequestModel pauseEvent;
 
     public PlayerListener(TrackRequestModel track)  {
         this.startEvent = asStartEvent(track);
         this.pauseEvent = asPauseEvent(track);
+        this.observers = new HashMap<>();
     }
 
-    public void removeObserver() {
-        if (observer != null) {
-            observer.onComplete();
-        }
-        observer = null;
+    public void removeObserver(String key) {
+    	if (observers.containsKey(key)) {
+    		observers.remove(key).onComplete();
+		}
     }
 
-    public void addObserver(Observer<? super EventRequestModel> observer) {
-        this.observer = observer;
+    public void putObserver(String key, Observer<? super EventRequestModel> observer) {
+        this.observers.put(key, observer);
     }
 
     public void onProgressChanged(double progress) {
-        if (observer != null) {
-            observer.onNext(asProgressEvent(progress));
-        }
+    	for (Observer<? super EventRequestModel> observer: observers.values()) {
+			observer.onNext(asProgressEvent(progress));
+		}
     }
 
     @Override
@@ -66,7 +68,7 @@ public class PlayerListener implements Player.EventListener {
 
     @Override
     public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
-        if (observer != null) {
+		for (Observer<? super EventRequestModel> observer: observers.values()) {
             observer.onNext(playWhenReady ? startEvent : pauseEvent);
         }
     }
@@ -83,7 +85,7 @@ public class PlayerListener implements Player.EventListener {
 
     @Override
     public void onPlayerError(ExoPlaybackException error) {
-        if (observer != null) {
+		for (Observer<? super EventRequestModel> observer: observers.values()) {
             observer.onError(error);
         }
     }

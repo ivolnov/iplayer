@@ -8,6 +8,7 @@ import com.intech.player.clean.boundaries.PlayerController;
 import com.intech.player.clean.boundaries.model.EventRequestModel;
 import com.intech.player.controller.utils.PlayerPositionCalculator;
 
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
@@ -27,9 +28,9 @@ import io.reactivex.schedulers.Schedulers;
  */
 public class ITunesPlayerController implements PlayerController {
 
-    private static final TimeUnit POLL_PROGRESS_UNIT = TimeUnit.MILLISECONDS;
     private static final int POLL_PROGRESS_EACH = 200;
     private static final int POLL_PROGRESS_AFTER = 0;
+    private static final TimeUnit POLL_PROGRESS_UNIT = TimeUnit.MILLISECONDS;
 
     @Inject
     SimpleExoPlayer player;
@@ -61,10 +62,11 @@ public class ITunesPlayerController implements PlayerController {
 
     @Override
     public Observable<EventRequestModel> getPlayerEvents() {
+        final String key = UUID.randomUUID().toString();
         return new Observable<EventRequestModel>() {
             @Override
             protected void subscribeActual(Observer<? super EventRequestModel> observer) {
-                listener.addObserver(observer);
+                listener.putObserver(key, observer);
                 player.addListener(listener);
                 observer.onNext(player.getPlayWhenReady()
                         ? listener.getStartEvent()
@@ -76,7 +78,7 @@ public class ITunesPlayerController implements PlayerController {
         .doOnSubscribe(this::startProgressPolling)
         .doOnDispose(()-> {
             stopProgressPolling();
-            listener.removeObserver();
+            listener.removeObserver(key);
             player.removeListener(listener);
         });
     }
@@ -130,8 +132,5 @@ public class ITunesPlayerController implements PlayerController {
         if (player != null) {
             player.release();
         }
-        if (listener != null) {
-			listener.removeObserver();
-		}
     }
 }

@@ -123,12 +123,12 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
     private void handleEvent(EventRequestModel event) {
         switch (event.getType()) {
             case Start:
-                if (mButtonState == Pause) {
+                if (mButtonState == Play) {
                     toggleButton();
                 }
                 break;
             case Pause:
-                if (mButtonState == Play) {
+                if (mButtonState == Pause) {
                     toggleButton();
                 }
                 break;
