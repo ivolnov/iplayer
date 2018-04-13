@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Player</string>
+    <string name="app_name">IPlayer</string>
     <string name="artworks_img_description">Artwork</string>
     <string name="player_surface_description">Player screen</string>
     <string name="player_artwork_description">Player artwork</string>

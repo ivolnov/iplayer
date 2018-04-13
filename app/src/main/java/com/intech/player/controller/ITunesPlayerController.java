@@ -20,6 +20,8 @@ import io.reactivex.Observer;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 
+import static com.google.android.exoplayer2.C.VIDEO_SCALING_MODE_SCALE_TO_FIT_WITH_CROPPING;
+
 /**
  * Self explanatory.
  *
@@ -42,7 +44,10 @@ public class ITunesPlayerController implements PlayerController {
 
     @Override
     public Completable start() {
-        return completableFrom(() ->  player.setPlayWhenReady(true));
+        return completableFrom(() ->  {
+            player.setPlayWhenReady(true);
+            player.setVideoScalingMode(VIDEO_SCALING_MODE_SCALE_TO_FIT_WITH_CROPPING);
+        });
     }
 
     @Override
@@ -85,6 +90,7 @@ public class ITunesPlayerController implements PlayerController {
 
     public void setVideoSurface(SurfaceView view) {
         player.setVideoSurfaceView(view);
+		player.setVideoScalingMode(VIDEO_SCALING_MODE_SCALE_TO_FIT_WITH_CROPPING);
     }
 
     public void clearVideoSurface() {

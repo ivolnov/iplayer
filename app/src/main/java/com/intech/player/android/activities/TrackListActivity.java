@@ -1,7 +1,7 @@
 package com.intech.player.android.activities;
 
+
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.widget.FrameLayout;
 
 import com.intech.player.R;
@@ -13,7 +13,7 @@ import javax.inject.Inject;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class TrackListActivity extends AppCompatActivity {
+public class TrackListActivity extends AppActivity {
 
     @BindView(R.id.fragment_container)
     FrameLayout container;

@@ -62,6 +62,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements PlayerView, 
     @Inject
     Picasso picasso;
 
+    private boolean mBound;
     private CoordinatorLayout mCoordinatorLayout;
 
     private ServiceConnection mConnection = new ServiceConnection() {
@@ -74,8 +75,6 @@ public class PlayerFragment extends MvpAppCompatFragment implements PlayerView, 
             dependenciesConsumer.setTrack(playerPresenter.getTrack());
 
             if (playerPresenter.isVideo()) {
-                surface.setVisibility(View.VISIBLE);
-                artwork.setVisibility(View.GONE);
                 dependenciesConsumer.setSurfaceView(surface);
             }
         }
@@ -104,12 +103,8 @@ public class PlayerFragment extends MvpAppCompatFragment implements PlayerView, 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         startListeningToBackButton();
-        if (getActivity() != null) {
-            final TrackViewModel track = getActivity()
-                    .getIntent()
-                    .getParcelableExtra(EXTRA_SELECTED_TRACK);
-            playerPresenter.setTrack(track);
-        }
+        setTrack();
+        startService();
     }
 
     @Override
@@ -135,12 +130,6 @@ public class PlayerFragment extends MvpAppCompatFragment implements PlayerView, 
     }
 
     @Override
-    public void onStart() {
-        super.onStart();
-        startService();
-    }
-
-    @Override
     public void onResume() {
         super.onResume();
         button.setOnClickListener(view -> playerPresenter.buttonCLicked());
@@ -158,8 +147,9 @@ public class PlayerFragment extends MvpAppCompatFragment implements PlayerView, 
     public void onStop() {
         super.onStop();
         playerPresenter.listenToPlayer(false);
-        if (getActivity() != null) {
+        if (mBound && getActivity() != null) {
             getActivity().unbindService(mConnection);
+            mBound = false;
         }
     }
 
@@ -168,6 +158,18 @@ public class PlayerFragment extends MvpAppCompatFragment implements PlayerView, 
         Snackbar
                 .make(mCoordinatorLayout, error, Snackbar.LENGTH_LONG)
                 .show();
+    }
+
+    @Override
+    public void showSurface(boolean show) {
+        if (show) {
+            artwork.setVisibility(View.GONE);
+            surface.setVisibility(View.VISIBLE);
+        } else {
+            artwork.setVisibility(View.VISIBLE);
+            surface.setVisibility(View.GONE);
+        }
+
     }
 
     @Override
@@ -196,6 +198,15 @@ public class PlayerFragment extends MvpAppCompatFragment implements PlayerView, 
         }
     }
 
+    private void setTrack() {
+        if (getActivity() != null) {
+            final TrackViewModel track = getActivity()
+                    .getIntent()
+                    .getParcelableExtra(EXTRA_SELECTED_TRACK);
+            playerPresenter.setTrack(track);
+        }
+    }
+
     private void startService() {
         if (getActivity() == null) {
             return;
@@ -209,6 +220,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements PlayerView, 
                         .startService(serviceIntent());
             }
             getActivity().bindService(serviceIntent(), mConnection, Context.BIND_IMPORTANT);
+            mBound = true;
         }
     }
 

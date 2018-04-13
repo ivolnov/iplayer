@@ -138,9 +138,9 @@ public class PlayerBoundForegroundService extends Service {
 
             stopPlayer();
             initPlayer(track);
-
-            mEventsDisposable = subscribeOnPlayerEvents();
         }
+
+        mEventsDisposable = subscribeOnPlayerEvents();
     }
 
     private void initPlayer(TrackViewModel track) {

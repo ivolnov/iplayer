@@ -130,11 +130,13 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
                 if (mButtonState == Play) {
                     toggleButton();
                 }
+                showSurface(true);
                 break;
             case Pause:
                 if (mButtonState == Pause) {
                     toggleButton();
                 }
+                showSurface(false);
                 break;
             case Progress:
                 getViewState().setProgress(event.getProgress());
@@ -153,6 +155,12 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
     private void disposeEvents() {
         if (mPlayerEventsDisposable != null) {
             mPlayerEventsDisposable.dispose();
+        }
+    }
+
+    private void showSurface(boolean show) {
+        if (isVideo()) {
+            getViewState().showSurface(show);
         }
     }
 }
