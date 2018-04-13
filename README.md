@@ -1,5 +1,5 @@
 # IPlayer
-### Test task for Intech's android developer job position.
+### A test task for Intech's android developer job position.
 
 A player application powered by [itunes API ](https://itunes.apple.com/search?term=hendrix).
 
