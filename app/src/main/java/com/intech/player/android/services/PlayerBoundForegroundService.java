@@ -32,8 +32,6 @@ import io.reactivex.disposables.Disposable;
 import static com.intech.player.App.INVALID_ID;
 import static com.intech.player.android.fragments.PlayerFragment.EXTRA_TRACK;
 import static com.intech.player.android.fragments.TrackListFragment.EXTRA_SELECTED_TRACK;
-import static com.intech.player.android.services.PlayerBoundForegroundService.PlayerState.Paused;
-import static com.intech.player.android.services.PlayerBoundForegroundService.PlayerState.Playing;
 import static com.intech.player.android.utils.AndroidUtils.oreo;
 import static com.intech.player.mvp.models.utils.ModelConverter.asTrackRequestModel;
 
@@ -58,14 +56,11 @@ public class PlayerBoundForegroundService extends Service {
 
     public static final int MAX_PROGRESS = 100;
 
-    public enum PlayerState {Playing, Paused}
-
     public interface DependenciesConsumer {
         void setSurfaceView(SurfaceView view);
         void setTrack(TrackViewModel track);
     }
 
-    private PlayerState mState = Paused;
     private NotificationCompat.Builder mNotificationBuilder;
     private NotificationManager mNotificationManager;
 
@@ -123,16 +118,13 @@ public class PlayerBoundForegroundService extends Service {
     public boolean onUnbind(Intent intent) {
         super.onUnbind(intent);
         playerController.clearVideoSurface();
-        if (mState != Playing) {
-            mEventsDisposable.dispose();
-            stopPlayer();
-			stopSelf();
-        }
+        mEventsDisposable.dispose();
         return true;
     }
 
     @Override
     public void onDestroy() {
+        stopPlayer();
         super.onDestroy();
     }
 
@@ -140,7 +132,6 @@ public class PlayerBoundForegroundService extends Service {
 
         if (isNew(track)) {
             mTrack = track;
-            mState = Paused;
 
             stopForeground(true);
             startForeground();
@@ -180,11 +171,9 @@ public class PlayerBoundForegroundService extends Service {
         switch (event.getType()) {
             case Start:
                 onStartNotification();
-                mState = Playing;
                 break;
             case Pause:
                 onPauseNotification();
-                mState = Paused;
                 break;
             case Progress:
                 onProgressNotification(event);

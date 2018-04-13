@@ -22,6 +22,7 @@ import com.arellomobile.mvp.MvpAppCompatFragment;
 import com.arellomobile.mvp.presenter.InjectPresenter;
 import com.intech.player.App;
 import com.intech.player.R;
+import com.intech.player.android.activities.PlayerActivity;
 import com.intech.player.android.services.PlayerBoundForegroundService;
 import com.intech.player.mvp.models.TrackViewModel;
 import com.intech.player.mvp.presenters.PlayerPresenter;
@@ -42,7 +43,7 @@ import static com.intech.player.android.utils.AndroidUtils.oreo;
  * @author Ivan Volnov
  * @since 01.04.18
  */
-public class PlayerFragment extends MvpAppCompatFragment implements PlayerView {
+public class PlayerFragment extends MvpAppCompatFragment implements PlayerView, PlayerActivity.OnBackPressedListener {
 
     public static final String EXTRA_TRACK = "com.intech.player.EXTRA_TRACK";
 
@@ -89,10 +90,20 @@ public class PlayerFragment extends MvpAppCompatFragment implements PlayerView {
         App.getAppComponent().inject(this);
     }
 
+    @Override
+    public void onBackPressed() {
+        if (getActivity() == null) {
+            return;
+        }
+        if (playerPresenter.isPaused()) {
+            getActivity().stopService(serviceIntent());
+        }
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        startListeningToBackButton();
         if (getActivity() != null) {
             final TrackViewModel track = getActivity()
                     .getIntent()
@@ -126,21 +137,7 @@ public class PlayerFragment extends MvpAppCompatFragment implements PlayerView {
     @Override
     public void onStart() {
         super.onStart();
-
-        if (getActivity() == null) {
-            return;
-        }
-
-        if (playerPresenter.hasTrack()) {
-			if (oreo()) {
-				getActivity()
-                        .startForegroundService(new Intent(getContext(), PlayerBoundForegroundService.class));
-			} else {
-				getActivity()
-                        .startService(new Intent(getContext(), PlayerBoundForegroundService.class));
-			}
-            getActivity().bindService(serviceIntent(), mConnection, Context.BIND_IMPORTANT);
-        }
+        startService();
     }
 
     @Override
@@ -193,8 +190,30 @@ public class PlayerFragment extends MvpAppCompatFragment implements PlayerView {
         progressBar.setProgress((int)(progress * progressBar.getMax()));
     }
 
+    private void startListeningToBackButton() {
+        if (getActivity() instanceof PlayerActivity) {
+            ((PlayerActivity) getActivity()).setListener(this);
+        }
+    }
+
+    private void startService() {
+        if (getActivity() == null) {
+            return;
+        }
+        if (playerPresenter.hasTrack()) {
+            if (oreo()) {
+                getActivity()
+                        .startForegroundService(serviceIntent());
+            } else {
+                getActivity()
+                        .startService(serviceIntent());
+            }
+            getActivity().bindService(serviceIntent(), mConnection, Context.BIND_IMPORTANT);
+        }
+    }
+
     private Intent serviceIntent() {
-        return new Intent(getActivity(), PlayerBoundForegroundService.class)
+        return new Intent(getContext(), PlayerBoundForegroundService.class)
                 .putExtra(EXTRA_TRACK, playerPresenter.getTrack());
     }
 }

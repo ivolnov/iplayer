@@ -70,6 +70,10 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
         return hasTrack() && getTrack().getPreviewUrl().endsWith(VIDEO_EXTENTION);
     }
 
+    public boolean isPaused() {
+        return mButtonState == Play;
+    }
+
     public void listenToPlayer(boolean listen) {
         disposeEvents();
         if (listen) {
