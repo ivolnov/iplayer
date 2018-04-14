@@ -36,9 +36,11 @@ import static com.intech.player.android.utils.AndroidUtils.oreo;
 import static com.intech.player.mvp.models.utils.ModelConverter.asTrackRequestModel;
 
 /**
- * A started by {@link com.intech.player.android.activities.PlayerActivity} service.
- * Stops itself during unBind when player is not playing otherwise keeps running in foreground.
- * During rebind gets necessary data through {@link DependenciesConsumer} interface implemented by
+ * A started by {@link com.intech.player.android.fragments.PlayerFragment} service.
+ * Keeps running in foreground until explicitly stopped, hopefully.
+ * The idea is that when we leave a player through the back button it'll be stopped
+ * otherwise we believe that current track is still relevant.
+ * During rebind gets necessary data via {@link DependenciesConsumer} interface implemented by
  * {@link LocalBinder} and configures controller, notifications and etc...
  *
  *

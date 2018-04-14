@@ -3,6 +3,9 @@ package com.intech.player.mvp.views;
 import android.support.annotation.NonNull;
 
 import com.arellomobile.mvp.MvpView;
+import com.arellomobile.mvp.viewstate.strategy.AddToEndSingleStrategy;
+import com.arellomobile.mvp.viewstate.strategy.SkipStrategy;
+import com.arellomobile.mvp.viewstate.strategy.StateStrategyType;
 import com.intech.player.mvp.models.TrackViewModel;
 
 /**
@@ -12,6 +15,8 @@ import com.intech.player.mvp.models.TrackViewModel;
  * @since 01.04.18
  */
 public interface TrackListView extends MvpView {
+    @StateStrategyType(SkipStrategy.class)
     void addTrack(@NonNull TrackViewModel track);
+    @StateStrategyType(AddToEndSingleStrategy.class)
     void showError(@NonNull String message);
 }

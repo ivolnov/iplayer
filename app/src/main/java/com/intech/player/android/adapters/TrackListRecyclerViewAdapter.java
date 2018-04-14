@@ -1,5 +1,6 @@
 package com.intech.player.android.adapters;
 
+import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -43,7 +44,7 @@ public class TrackListRecyclerViewAdapter extends RecyclerView.Adapter<TrackList
     }
 
     @Override
-    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public @NonNull ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         final View view = LayoutInflater
                 .from(parent.getContext())
                 .inflate(R.layout.track_item, parent, false);
@@ -51,7 +52,7 @@ public class TrackListRecyclerViewAdapter extends RecyclerView.Adapter<TrackList
     }
 
     @Override
-    public void onBindViewHolder(final ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         final TrackViewModel track = mTracks.get(position);
         holder.view.setOnClickListener(view -> mListener.onItemClicked(track));
         holder.artist.setText(track.getArtist());
