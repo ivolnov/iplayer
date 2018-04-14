@@ -1,12 +1,11 @@
-package com.intech.player.controller;
+package com.intech.player.controllers;
 
-import android.support.annotation.VisibleForTesting;
 import android.view.SurfaceView;
 
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.intech.player.clean.boundaries.PlayerController;
 import com.intech.player.clean.boundaries.model.EventRequestModel;
-import com.intech.player.controller.utils.PlayerPositionCalculator;
+import com.intech.player.controllers.utils.PlayerPositionCalculator;
 
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -51,11 +50,6 @@ public class ITunesPlayerController implements PlayerController {
     }
 
     @Override
-    public Completable seek(long position) {
-        return completableFrom(() ->  player.seekTo(position));
-    }
-
-    @Override
     public Completable pause() {
         return completableFrom(() ->  player.setPlayWhenReady(false));
     }
@@ -73,9 +67,7 @@ public class ITunesPlayerController implements PlayerController {
             protected void subscribeActual(Observer<? super EventRequestModel> observer) {
                 listener.putObserver(key, observer);
                 player.addListener(listener);
-                observer.onNext(player.getPlayWhenReady()
-                        ? listener.getStartEvent()
-                        : listener.getPauseEvent());
+                fireNewcomersEvents(observer);
             }
         }
         .subscribeOn(Schedulers.single())
@@ -91,15 +83,6 @@ public class ITunesPlayerController implements PlayerController {
     public void setVideoSurface(SurfaceView view) {
         player.setVideoSurfaceView(view);
 		player.setVideoScalingMode(VIDEO_SCALING_MODE_SCALE_TO_FIT_WITH_CROPPING);
-    }
-
-    public void clearVideoSurface() {
-        player.clearVideoSurface();
-    }
-
-    @VisibleForTesting
-    SimpleExoPlayer getPlayer() {
-        return player;
     }
 
     private Completable completableFrom(Runnable todo) {
@@ -128,6 +111,12 @@ public class ITunesPlayerController implements PlayerController {
                 .subscribe(
                         s -> listener.onProgressChanged(PlayerPositionCalculator.calculate(player))
                 );
+    }
+
+    private void fireNewcomersEvents(Observer<? super EventRequestModel> observer) {
+        observer.onNext(player.getPlayWhenReady()
+                ? listener.getPlayEvent()
+                : listener.getPauseEvent());
     }
 
     private void stopProgressPolling() {

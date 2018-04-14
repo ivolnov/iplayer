@@ -43,7 +43,11 @@ import static com.intech.player.android.utils.AndroidUtils.oreo;
  * @author Ivan Volnov
  * @since 01.04.18
  */
-public class PlayerFragment extends MvpAppCompatFragment implements PlayerView, PlayerActivity.OnBackPressedListener {
+public class PlayerFragment
+        extends MvpAppCompatFragment
+        implements PlayerView,
+        PlayerBoundForegroundService.UiComponent,
+        PlayerActivity.OnBackPressedListener {
 
     public static final String EXTRA_TRACK = "com.intech.player.EXTRA_TRACK";
 
@@ -68,15 +72,9 @@ public class PlayerFragment extends MvpAppCompatFragment implements PlayerView, 
     private ServiceConnection mConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
-            final PlayerBoundForegroundService.DependenciesConsumer dependenciesConsumer
-                    = (PlayerBoundForegroundService.DependenciesConsumer) iBinder;
-
-            playerPresenter.listenToPlayer(true);
-            dependenciesConsumer.setTrack(playerPresenter.getTrack());
-
-            if (playerPresenter.isVideo()) {
-                dependenciesConsumer.setSurfaceView(surface);
-            }
+            final PlayerBoundForegroundService.UiConsumer dependenciesConsumer
+                    = (PlayerBoundForegroundService.UiConsumer) iBinder;
+            dependenciesConsumer.plugIn(PlayerFragment.this);
         }
 
         @Override
@@ -97,6 +95,21 @@ public class PlayerFragment extends MvpAppCompatFragment implements PlayerView, 
         if (playerPresenter.isPaused()) {
             getActivity().stopService(serviceIntent());
         }
+    }
+
+    @Override
+    public TrackViewModel getTrack() {
+        return playerPresenter.getTrack();
+    }
+
+    @Override
+    public SurfaceView getSurface() {
+        return surface;
+    }
+
+    @Override
+    public void startListening() {
+        playerPresenter.listenToPlayer(true);
     }
 
     @Override
@@ -154,22 +167,19 @@ public class PlayerFragment extends MvpAppCompatFragment implements PlayerView, 
     }
 
     @Override
+    public void showSurface() {
+        if (surface.getVisibility() == View.VISIBLE) {
+            return;
+        }
+        artwork.setVisibility(View.GONE);
+        surface.setVisibility(View.VISIBLE);
+    }
+
+    @Override
     public void showError(String error) {
         Snackbar
                 .make(mCoordinatorLayout, error, Snackbar.LENGTH_LONG)
                 .show();
-    }
-
-    @Override
-    public void showSurface(boolean show) {
-        if (show) {
-            artwork.setVisibility(View.GONE);
-            surface.setVisibility(View.VISIBLE);
-        } else {
-            artwork.setVisibility(View.VISIBLE);
-            surface.setVisibility(View.GONE);
-        }
-
     }
 
     @Override

@@ -31,8 +31,8 @@ public class ModelConverter {
         });
     }
 
-    public static EventRequestModel asStartEvent(@NonNull TrackRequestModel track) {
-        return buildEvent(EventRequestModel.Type.Start, track, INVALID_PROGRESS);
+    public static EventRequestModel asPlayEvent(@NonNull TrackRequestModel track) {
+        return buildEvent(EventRequestModel.Type.Play, track, INVALID_PROGRESS);
     }
 
     public static EventRequestModel asPauseEvent(@NonNull TrackRequestModel track) {

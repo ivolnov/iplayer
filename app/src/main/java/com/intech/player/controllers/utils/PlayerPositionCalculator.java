@@ -1,4 +1,4 @@
-package com.intech.player.controller.utils;
+package com.intech.player.controllers.utils;
 
 import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.ExoPlayer;

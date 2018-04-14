@@ -4,6 +4,8 @@
     <string name="player_surface_description">Player screen</string>
     <string name="player_artwork_description">Player artwork</string>
     <string name="action_search">Search</string>
+    <string name="search_hint">Enter a name of a track or an artist</string>
+    <string name="promo_query">Justin Bieber</string>
     <string name="action_settings">Settings</string>
     <string name="player_notifications_channel">IPlayer background notifications.</string>
 </resources>

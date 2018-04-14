@@ -2,7 +2,9 @@ package com.intech.player.di.modules;
 
 import com.intech.player.api.ITunesApi;
 import com.intech.player.api.ITunesTrackService;
-import com.intech.player.controller.ITunesPlayerController;
+import com.intech.player.clean.boundaries.PlayerController;
+import com.intech.player.clean.boundaries.TrackService;
+import com.intech.player.controllers.ITunesPlayerController;
 
 import javax.inject.Singleton;
 
@@ -19,7 +21,7 @@ import retrofit2.Retrofit;
 @Module(includes = {RetrofitModule.class})
 public class ITunesModule {
     @Provides
-    public ITunesTrackService provideITunesTrackService(ITunesApi api) {
+    public TrackService provideITunesTrackService(ITunesApi api) {
         return new ITunesTrackService(api);
     }
 
@@ -30,7 +32,7 @@ public class ITunesModule {
 
     @Provides
     @Singleton
-    public ITunesPlayerController provideITunesPlayerController() {
+    public PlayerController provideITunesPlayerController() {
         return new ITunesPlayerController();
     }
 }

@@ -17,6 +17,8 @@ import com.intech.player.mvp.models.TrackViewModel;
 public interface TrackListView extends MvpView {
     @StateStrategyType(SkipStrategy.class)
     void addTrack(@NonNull TrackViewModel track);
+    @StateStrategyType(SkipStrategy.class)
+    void applySearchQuery(String query);
     @StateStrategyType(AddToEndSingleStrategy.class)
     void showError(@NonNull String message);
 }

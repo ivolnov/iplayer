@@ -11,6 +11,8 @@ import com.intech.player.mvp.models.TrackViewModel;
  */
 public class ModelConverter {
 
+    private static final String VIDEO_EXTENSION = "m4v";
+
     public static TrackViewModel asTrackViewModel(TrackRequestModel track) {
         return new TrackViewModel()
                 .setArtist(track.getArtist())
@@ -25,5 +27,9 @@ public class ModelConverter {
                 .setTrackName(track.getTrackName())
                 .setArtworkUrl(track.getArtworkUrl())
                 .setPreviewUrl(track.getPreviewUrl());
+    }
+
+    public static boolean isVideo(TrackViewModel track) {
+        return track.getPreviewUrl().endsWith(VIDEO_EXTENSION);
     }
 }

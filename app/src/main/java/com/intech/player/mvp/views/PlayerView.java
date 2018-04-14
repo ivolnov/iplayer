@@ -13,7 +13,7 @@ import com.arellomobile.mvp.viewstate.strategy.StateStrategyType;
  */
 public interface PlayerView extends MvpView {
     @StateStrategyType(SkipStrategy.class)
-    void showSurface(boolean show);
+    void showSurface();
     @StateStrategyType(AddToEndSingleStrategy.class)
     void showError(String error);
     @StateStrategyType(AddToEndSingleStrategy.class)

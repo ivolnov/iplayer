@@ -1,4 +1,4 @@
-package com.intech.player.controller;
+package com.intech.player.controllers;
 
 import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.PlaybackParameters;
@@ -14,8 +14,8 @@ import java.util.HashMap;
 import io.reactivex.Observer;
 
 import static com.intech.player.clean.boundaries.model.utils.ModelConverter.asPauseEvent;
+import static com.intech.player.clean.boundaries.model.utils.ModelConverter.asPlayEvent;
 import static com.intech.player.clean.boundaries.model.utils.ModelConverter.asProgressEvent;
-import static com.intech.player.clean.boundaries.model.utils.ModelConverter.asStartEvent;
 
 /**
  * Self explanatory.
@@ -26,11 +26,11 @@ import static com.intech.player.clean.boundaries.model.utils.ModelConverter.asSt
 public class PlayerListener implements Player.EventListener {
 
     private HashMap<String, Observer<? super EventRequestModel>> observers;
-    private final EventRequestModel startEvent;
+    private final EventRequestModel playEvent;
     private final EventRequestModel pauseEvent;
 
     public PlayerListener(TrackRequestModel track)  {
-        this.startEvent = asStartEvent(track);
+        this.playEvent = asPlayEvent(track);
         this.pauseEvent = asPauseEvent(track);
         this.observers = new HashMap<>();
     }
@@ -69,7 +69,7 @@ public class PlayerListener implements Player.EventListener {
     @Override
     public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
 		for (Observer<? super EventRequestModel> observer: observers.values()) {
-            observer.onNext(playWhenReady ? startEvent : pauseEvent);
+            observer.onNext(playWhenReady ? playEvent : pauseEvent);
         }
     }
 
@@ -105,8 +105,8 @@ public class PlayerListener implements Player.EventListener {
 
     }
 
-    public EventRequestModel getStartEvent() {
-        return startEvent;
+    public EventRequestModel getPlayEvent() {
+        return playEvent;
     }
 
     public EventRequestModel getPauseEvent() {

@@ -19,11 +19,14 @@ import com.intech.player.BuildConfig;
 import com.intech.player.R;
 import com.intech.player.android.activities.PlayerActivity;
 import com.intech.player.android.activities.TrackListActivity;
+import com.intech.player.clean.boundaries.PlayerController;
 import com.intech.player.clean.boundaries.model.EventRequestModel;
-import com.intech.player.controller.ITunesPlayerController;
+import com.intech.player.controllers.ITunesPlayerController;
 import com.intech.player.di.DaggerPlayerComponent;
 import com.intech.player.mvp.models.TrackViewModel;
 import com.intech.player.mvp.presenters.utils.UserMessageCompiler;
+
+import java.lang.ref.WeakReference;
 
 import javax.inject.Inject;
 
@@ -34,14 +37,15 @@ import static com.intech.player.android.fragments.PlayerFragment.EXTRA_TRACK;
 import static com.intech.player.android.fragments.TrackListFragment.EXTRA_SELECTED_TRACK;
 import static com.intech.player.android.utils.AndroidUtils.oreo;
 import static com.intech.player.mvp.models.utils.ModelConverter.asTrackRequestModel;
+import static com.intech.player.mvp.models.utils.ModelConverter.isVideo;
 
 /**
  * A started by {@link com.intech.player.android.fragments.PlayerFragment} service.
  * Keeps running in foreground until explicitly stopped, hopefully.
  * The idea is that when we leave a player through the back button it'll be stopped
  * otherwise we believe that current track is still relevant.
- * During rebind gets necessary data via {@link DependenciesConsumer} interface implemented by
- * {@link LocalBinder} and configures controller, notifications and etc...
+ * During rebind gets necessary data via {@link UiConsumer} interface implemented by
+ * {@link LocalBinder} to configure controller, notifications...
  *
  *
  * @author Ivan Volnov
@@ -58,9 +62,14 @@ public class PlayerBoundForegroundService extends Service {
 
     public static final int MAX_PROGRESS = 100;
 
-    public interface DependenciesConsumer {
-        void setSurfaceView(SurfaceView view);
-        void setTrack(TrackViewModel track);
+    public interface UiComponent {
+        TrackViewModel getTrack();
+        SurfaceView getSurface();
+        void startListening();
+    }
+
+    public interface UiConsumer {
+        void plugIn(UiComponent ui);
     }
 
     private NotificationCompat.Builder mNotificationBuilder;
@@ -71,28 +80,21 @@ public class PlayerBoundForegroundService extends Service {
 
     private Disposable mEventsDisposable;
     private LocalBinder mBinder;
+    private WeakReference<UiComponent> mUi;
 
-    private class LocalBinder extends Binder implements DependenciesConsumer {
-
-        private TrackViewModel track;
-
-        @Override
-        public void setSurfaceView(SurfaceView view) {
-            PlayerBoundForegroundService.this.playerController.setVideoSurface(view);
-        }
-
-        @Override
-        public void setTrack(TrackViewModel track) {
-            this.track = track;
+    private class LocalBinder extends Binder implements UiConsumer {
+        public void plugIn(UiComponent ui) {
+            mUi = new WeakReference<>(ui);
         }
     }
 
     @Inject
-    ITunesPlayerController playerController;
+    PlayerController playerController;
 
     public PlayerBoundForegroundService() {
         App.getAppComponent().inject(this);
         mBinder = new LocalBinder();
+        mUi = new WeakReference<>(null);
     }
 
     @Override
@@ -106,27 +108,26 @@ public class PlayerBoundForegroundService extends Service {
     public IBinder onBind(Intent intent) {
         final TrackViewModel track = intent.getParcelableExtra(EXTRA_TRACK);
         handleTrack(track);
-        mEventsDisposable = subscribeOnPlayerEvents();
         return mBinder;
     }
 
     @Override
     public void onRebind(Intent intent) {
         super.onRebind(intent);
-        handleTrack(mBinder.track);
+        handleTrack(mUi.get().getTrack());
     }
 
     @Override
     public boolean onUnbind(Intent intent) {
         super.onUnbind(intent);
-        playerController.clearVideoSurface();
         return true;
     }
 
     @Override
     public void onDestroy() {
-        mEventsDisposable.dispose();
+        disposeEvents();
         stopPlayer();
+        stopForeground(true);
         super.onDestroy();
     }
 
@@ -134,11 +135,15 @@ public class PlayerBoundForegroundService extends Service {
         if (isNew(track)) {
             mTrack = track;
 
+            disposeEvents();
+
             stopForeground(true);
             startForeground();
 
             stopPlayer();
             initPlayer(track);
+
+            mEventsDisposable = subscribeOnPlayerEvents();
         }
     }
 
@@ -148,7 +153,7 @@ public class PlayerBoundForegroundService extends Service {
                 .context(App.getAppComponent().getContext())
                 .track(asTrackRequestModel(track))
                 .build()
-                .inject(playerController);
+                .inject((ITunesPlayerController) playerController);
     }
 
     private void stopPlayer() {
@@ -168,14 +173,15 @@ public class PlayerBoundForegroundService extends Service {
 
     private void handleEvent(EventRequestModel event) {
         switch (event.getType()) {
-            case Start:
-                onStartNotification();
+            case Play:
+                onPlayNotification();
                 break;
             case Pause:
                 onPauseNotification();
                 break;
             case Progress:
                 onProgressNotification(event);
+                pingUi();
                 break;
         }
     }
@@ -190,7 +196,7 @@ public class PlayerBoundForegroundService extends Service {
         startForeground(FOREGROUND_ID, buildPauseNotification());
     }
 
-    private void onStartNotification() {
+    private void onPlayNotification() {
         getNotificationManager().notify(NOTIFICATION_ID, buildPlayNotification());
     }
 
@@ -272,4 +278,29 @@ public class PlayerBoundForegroundService extends Service {
 						new Intent[] {main, player},
 						PendingIntent.FLAG_CANCEL_CURRENT);
 	}
+
+	private void disposeEvents() {
+        if (mEventsDisposable != null) {
+            mEventsDisposable.dispose();
+        }
+    }
+
+    private void pingUi() {
+        final UiComponent ui = mUi.get();
+        if (ui != null) {
+            if (isVideo(mTrack)) {
+                setSurface(ui.getSurface());
+            }
+            ui.startListening();
+            mUi.clear();
+        }
+    }
+
+    private void setSurface(SurfaceView surface) {
+        if (playerController instanceof ITunesPlayerController) {
+            final ITunesPlayerController controller = (ITunesPlayerController) playerController;
+            controller.setVideoSurface(surface);
+        }
+    }
+
 }

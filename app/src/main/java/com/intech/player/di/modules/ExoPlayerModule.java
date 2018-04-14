@@ -20,7 +20,7 @@ import com.google.android.exoplayer2.util.EventLogger;
 import com.google.android.exoplayer2.util.Util;
 import com.intech.player.BuildConfig;
 import com.intech.player.clean.boundaries.model.TrackRequestModel;
-import com.intech.player.controller.PlayerListener;
+import com.intech.player.controllers.PlayerListener;
 
 import javax.inject.Named;
 

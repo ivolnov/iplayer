@@ -11,7 +11,7 @@ public class EventRequestModel {
     public static final int INVALID_PROGRESS = -1;
 
     public enum Type {
-        Start,
+        Play,
         Pause,
         Progress
     }

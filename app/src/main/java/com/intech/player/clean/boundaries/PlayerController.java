@@ -14,7 +14,6 @@ import io.reactivex.Observable;
 public interface PlayerController {
 
     Completable start();
-    Completable seek(long position);
     Completable pause();
     Completable stop();
     Observable<EventRequestModel> getPlayerEvents();

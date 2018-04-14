@@ -5,6 +5,8 @@
     <string name="player_surface_description">Экран плеера</string>
     <string name="player_artwork_description">Обложка плеера</string>
     <string name="action_search">Поиск</string>
+    <string name="search_hint">Введите название песни или исполнителя</string>
+    <string name="promo_query">Чайковский</string>
     <string name="action_settings">Настройки</string>
     <string name="player_notifications_channel">Фоновые сообщения IPlayer.</string>
 </resources>

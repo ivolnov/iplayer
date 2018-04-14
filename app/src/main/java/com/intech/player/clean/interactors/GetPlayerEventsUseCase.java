@@ -1,7 +1,7 @@
 package com.intech.player.clean.interactors;
 
+import com.intech.player.clean.boundaries.PlayerController;
 import com.intech.player.clean.boundaries.model.EventRequestModel;
-import com.intech.player.controller.ITunesPlayerController;
 
 import io.reactivex.Observable;
 
@@ -14,9 +14,9 @@ import io.reactivex.Observable;
  */
 public class GetPlayerEventsUseCase {
 
-    private ITunesPlayerController controller;
+    private PlayerController controller;
 
-    public GetPlayerEventsUseCase(ITunesPlayerController controller) {
+    public GetPlayerEventsUseCase(PlayerController controller) {
         this.controller = controller;
     }
 

@@ -3,7 +3,7 @@ package com.intech.player.di;
 import android.content.Context;
 
 import com.intech.player.clean.boundaries.model.TrackRequestModel;
-import com.intech.player.controller.ITunesPlayerController;
+import com.intech.player.controllers.ITunesPlayerController;
 import com.intech.player.di.modules.ExoPlayerModule;
 
 import javax.inject.Named;

@@ -7,7 +7,9 @@ import com.arellomobile.mvp.InjectViewState;
 import com.arellomobile.mvp.MvpPresenter;
 import com.intech.player.App;
 import com.intech.player.BuildConfig;
+import com.intech.player.clean.interactors.GetLastSearchQueryUseCase;
 import com.intech.player.clean.interactors.GetTrackListUseCase;
+import com.intech.player.clean.interactors.SetLastSearchQueryUseCase;
 import com.intech.player.mvp.presenters.utils.UserMessageCompiler;
 import com.intech.player.mvp.views.TrackListView;
 
@@ -32,18 +34,37 @@ public class TrackListPresenter extends MvpPresenter<TrackListView> {
 
     @Inject
     GetTrackListUseCase getTrackListUseCase;
+    @Inject
+    GetLastSearchQueryUseCase getLastSearchQueryUseCase;
+    @Inject
+    SetLastSearchQueryUseCase setLastSearchQueryUseCase;
 
     private Disposable mTrackListDisposable;
+    private Disposable mLastQueryDisposable;
 
     public TrackListPresenter() {
         App.getAppComponent().inject(this);
     }
 
+    public void onGetLastQuery() {
+        mLastQueryDisposable = getLastSearchQueryUseCase
+                .execute()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                        query -> {
+                            getViewState().applySearchQuery(query);
+                            mLastQueryDisposable.dispose();
+                        },
+                        this::handleError);
+    }
+
     public void onEnterQuery(@NonNull String query) {
         dispose();
 
-        mTrackListDisposable = getTrackListUseCase
+        mTrackListDisposable = setLastSearchQueryUseCase
                 .execute(query)
+                .flatMapObservable(persistedQuery -> getTrackListUseCase.execute(persistedQuery))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(

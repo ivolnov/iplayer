@@ -33,7 +33,6 @@ import static com.intech.player.mvp.presenters.PlayerPresenter.ButtonState.Play;
 public class PlayerPresenter extends MvpPresenter<PlayerView> {
 
     private static final String TAG = PlayerPresenter.class.getSimpleName();
-    private static final String VIDEO_EXTENTION = "m4v";
 
     enum ButtonState {Play, Pause}
 
@@ -66,14 +65,6 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
         return mTrack;
     }
 
-    public boolean isVideo() {
-        return hasTrack() && getTrack().getPreviewUrl().endsWith(VIDEO_EXTENTION);
-    }
-
-    public boolean isPaused() {
-        return mButtonState == Play;
-    }
-
     public void listenToPlayer(boolean listen) {
         disposeEvents();
         if (listen) {
@@ -85,6 +76,10 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
                             this::handleEvent,
                             this::handleError);
         }
+    }
+
+    public boolean isPaused() {
+        return mButtonState == Play;
     }
 
     public void buttonCLicked() {
@@ -126,17 +121,17 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
 
     private void handleEvent(EventRequestModel event) {
         switch (event.getType()) {
-            case Start:
+            case Play:
+                getViewState().showSurface();
                 if (mButtonState == Play) {
                     toggleButton();
                 }
-                showSurface(true);
                 break;
             case Pause:
+                getViewState().showSurface();
                 if (mButtonState == Pause) {
                     toggleButton();
                 }
-                showSurface(false);
                 break;
             case Progress:
                 getViewState().setProgress(event.getProgress());
@@ -155,12 +150,6 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
     private void disposeEvents() {
         if (mPlayerEventsDisposable != null) {
             mPlayerEventsDisposable.dispose();
-        }
-    }
-
-    private void showSurface(boolean show) {
-        if (isVideo()) {
-            getViewState().showSurface(show);
         }
     }
 }

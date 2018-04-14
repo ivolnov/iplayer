@@ -31,7 +31,6 @@ import static com.intech.player.util.TestUtils.http400Error;
  */
 public class ITunesTrackServiceUnitTest {
 
-
     @Test
     public void testsGetTracksOk() {
         new ITunesTrackService(buildApi())

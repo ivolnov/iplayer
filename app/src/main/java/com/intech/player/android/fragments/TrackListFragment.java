@@ -44,6 +44,7 @@ public class TrackListFragment extends MvpAppCompatFragment
     @BindView(R.id.list)
     RecyclerView recyclerView;
 
+    private SearchView mSearchView;
     private CoordinatorLayout mCoordinatorLayout;
     private TrackListRecyclerViewAdapter mAdapter;
 
@@ -56,7 +57,7 @@ public class TrackListFragment extends MvpAppCompatFragment
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater,
+    public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container,
                              Bundle savedInstanceState) {
         mCoordinatorLayout = (CoordinatorLayout) inflater
@@ -77,11 +78,20 @@ public class TrackListFragment extends MvpAppCompatFragment
         final MenuItem searchItem = menu.findItem(R.id.actions_search);
 
         if (searchItem != null) {
-            final SearchView searchView = (SearchView) searchItem.getActionView();
-            searchView.setOnQueryTextListener(getSearchTextListener());
+            mSearchView = (SearchView) searchItem.getActionView();
+            mSearchView.setOnQueryTextListener(getSearchTextListener());
+            trackListPresenter.onGetLastQuery();
         }
 
         super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public void applySearchQuery(String query) {
+        if (mSearchView.getQuery().equals(query)) {
+            return;
+        }
+        mSearchView.setQuery(query, true);
     }
 
     @Override
