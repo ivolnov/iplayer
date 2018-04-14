@@ -59,10 +59,10 @@ public class TrackListRecyclerViewAdapter extends RecyclerView.Adapter<TrackList
         holder.trackName.setText(track.getTrackName());
         picasso
                 .load(track.getArtworkUrl())
-                .placeholder(R.drawable.ic_picasso_placeholder)
-                .error(R.drawable.ic_picasso_error)
+                .placeholder(R.drawable.artwork_placeholder)
+                .error(R.drawable.error_placeholder)
                 .fit()
-                .centerCrop(Gravity.FILL)
+                .centerCrop(Gravity.FILL_HORIZONTAL)
                 .tag(this)
                 .into(holder.artworks);
     }

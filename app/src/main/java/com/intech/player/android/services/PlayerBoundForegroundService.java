@@ -85,6 +85,9 @@ public class PlayerBoundForegroundService extends Service {
     private class LocalBinder extends Binder implements UiConsumer {
         public void plugIn(UiComponent ui) {
             mUi = new WeakReference<>(ui);
+            if (isVideo(mTrack)) {
+                setSurface(mUi.get().getSurface());
+            }
         }
     }
 
@@ -288,9 +291,6 @@ public class PlayerBoundForegroundService extends Service {
     private void pingUi() {
         final UiComponent ui = mUi.get();
         if (ui != null) {
-            if (isVideo(mTrack)) {
-                setSurface(ui.getSurface());
-            }
             ui.startListening();
             mUi.clear();
         }

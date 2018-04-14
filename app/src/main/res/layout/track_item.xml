@@ -2,9 +2,8 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:maxHeight="?android:attr/listPreferredItemHeightLarge"
-    android:minHeight="?android:attr/listPreferredItemHeightLarge"
+    android:layout_height="?android:attr/listPreferredItemHeightLarge"
+    android:paddingTop="?android:attr/listPreferredItemPaddingStart"
     android:orientation="horizontal">
 
     <ImageView
@@ -28,7 +27,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceLarge"
-            android:text="Artist" />
+            />
 
         <TextView
             android:id="@+id/track_name"
@@ -37,7 +36,8 @@
             android:ellipsize="end"
             android:maxLines="2"
             android:textAppearance="?android:attr/textAppearanceMedium"
-            android:text="Trackname" />
+            />
+
     </LinearLayout>
 
 </LinearLayout>
