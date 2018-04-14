@@ -6,6 +6,11 @@
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorSecondaryDark</item>
         <item name="android:editTextColor">@color/colorTextOnPrimary</item>
+        <item name="actionBarTheme">@style/App.ActionBarTheme</item>
+    </style>
+
+    <style name="App.ActionBarTheme" parent="@style/ThemeOverlay.AppCompat.ActionBar">
+        <item name="colorControlNormal">@color/colorSecondaryDark</item>
     </style>
 
     <style name="AppTheme.NoActionBar">

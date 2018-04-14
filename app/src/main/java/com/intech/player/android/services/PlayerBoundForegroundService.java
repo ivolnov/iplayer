@@ -97,7 +97,6 @@ public class PlayerBoundForegroundService extends Service {
     public void onCreate() {
         super.onCreate();
 		createNotificationChannelForOreo();
-
     }
 
     @Nullable
@@ -105,6 +104,7 @@ public class PlayerBoundForegroundService extends Service {
     public IBinder onBind(Intent intent) {
         final TrackViewModel track = intent.getParcelableExtra(EXTRA_TRACK);
         handleTrack(track);
+        mEventsDisposable = subscribeOnPlayerEvents();
         return mBinder;
     }
 
@@ -118,18 +118,17 @@ public class PlayerBoundForegroundService extends Service {
     public boolean onUnbind(Intent intent) {
         super.onUnbind(intent);
         playerController.clearVideoSurface();
-        mEventsDisposable.dispose();
         return true;
     }
 
     @Override
     public void onDestroy() {
+        mEventsDisposable.dispose();
         stopPlayer();
         super.onDestroy();
     }
 
     private void handleTrack(TrackViewModel track) {
-
         if (isNew(track)) {
             mTrack = track;
 
@@ -139,8 +138,6 @@ public class PlayerBoundForegroundService extends Service {
             stopPlayer();
             initPlayer(track);
         }
-
-        mEventsDisposable = subscribeOnPlayerEvents();
     }
 
     private void initPlayer(TrackViewModel track) {
