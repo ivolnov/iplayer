@@ -9,7 +9,7 @@ import com.intech.player.clean.boundaries.model.TrackResponseModel;
 
 import io.reactivex.Observable;
 
-import static com.intech.player.clean.boundaries.model.EventRequestModel.INVALID_PROGRESS;
+import static com.intech.player.App.INVALID_ID;
 
 /**
  * Self explanatory.
@@ -32,11 +32,11 @@ public class ModelConverter {
     }
 
     public static EventRequestModel asPlayEvent(@NonNull TrackRequestModel track) {
-        return buildEvent(EventRequestModel.Type.Play, track, INVALID_PROGRESS);
+        return buildEvent(EventRequestModel.Type.Play, track, INVALID_ID);
     }
 
     public static EventRequestModel asPauseEvent(@NonNull TrackRequestModel track) {
-        return buildEvent(EventRequestModel.Type.Pause, track, INVALID_PROGRESS);
+        return buildEvent(EventRequestModel.Type.Pause, track, INVALID_ID);
     }
 
     public static EventRequestModel asProgressEvent(double progress) {

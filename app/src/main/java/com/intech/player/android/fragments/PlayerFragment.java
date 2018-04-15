@@ -132,7 +132,7 @@ public class PlayerFragment
         if (playerPresenter.hasTrack()) {
             picasso
                     .load(playerPresenter.getTrack().getArtworkUrl())
-                    .error(R.drawable.ic_picasso_error)
+                    .error(R.drawable.error_placeholder)
                     .tag(this)
                     .fit()
                     .centerCrop()

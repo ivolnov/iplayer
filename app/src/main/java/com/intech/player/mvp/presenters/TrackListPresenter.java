@@ -60,18 +60,26 @@ public class TrackListPresenter extends MvpPresenter<TrackListView> {
     }
 
     public void onEnterQuery(@NonNull String query) {
+        setLastSearchQueryUseCase
+                .execute(query)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnSuccess(this::getTracks)
+                .doOnError(this::handleError)
+                .subscribe();
+    }
+
+    private void getTracks(String query) {
         dispose();
 
-        mTrackListDisposable = setLastSearchQueryUseCase
+        mTrackListDisposable = getTrackListUseCase
                 .execute(query)
-                .flatMapObservable(persistedQuery -> getTrackListUseCase.execute(persistedQuery))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
                         track -> getViewState().addTrack(asTrackViewModel(track)),
                         this::handleError
                 );
-
     }
 
     private void dispose() {
