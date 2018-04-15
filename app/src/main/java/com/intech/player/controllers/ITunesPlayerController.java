@@ -2,6 +2,7 @@ package com.intech.player.controllers;
 
 import android.view.SurfaceView;
 
+import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.intech.player.clean.boundaries.PlayerController;
 import com.intech.player.clean.boundaries.model.EventRequestModel;
@@ -81,8 +82,11 @@ public class ITunesPlayerController implements PlayerController {
     }
 
     public void setVideoSurface(SurfaceView view) {
-        player.setVideoSurfaceView(view);
-		player.setVideoScalingMode(VIDEO_SCALING_MODE_SCALE_TO_FIT_WITH_CROPPING);
+        final Player.VideoComponent component = player.getVideoComponent();
+        if (component != null) {
+            component.setVideoScalingMode(VIDEO_SCALING_MODE_SCALE_TO_FIT_WITH_CROPPING);
+            component.setVideoSurfaceView(view);
+        }
     }
 
     private Completable completableFrom(Runnable todo) {
