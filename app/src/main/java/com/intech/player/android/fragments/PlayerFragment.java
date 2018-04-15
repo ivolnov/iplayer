@@ -38,6 +38,7 @@ import butterknife.ButterKnife;
 import static com.intech.player.android.fragments.TrackListFragment.EXTRA_SELECTED_TRACK;
 import static com.intech.player.android.utils.AndroidUtils.okIcon;
 import static com.intech.player.android.utils.AndroidUtils.oreo;
+import static com.intech.player.mvp.models.utils.ModelConverter.isVideo;
 
 /**
  * A {@link PlayerView} implementation.
@@ -132,13 +133,18 @@ public class PlayerFragment
         ButterKnife.bind(this, mCoordinatorLayout);
 
         if (playerPresenter.hasTrack()) {
-            picasso
-                    .load(playerPresenter.getTrack().getArtworkUrl())
-                    .error(R.drawable.error_placeholder)
-                    .tag(this)
-                    .fit()
-                    .centerCrop()
-                    .into(artwork);
+            if (isVideo(playerPresenter.getTrack())) {
+                artwork.setVisibility(View.GONE);
+                surface.setVisibility(View.VISIBLE);
+            } else {
+                picasso
+                        .load(playerPresenter.getTrack().getArtworkUrl())
+                        .error(R.drawable.error_placeholder)
+                        .tag(this)
+                        .fit()
+                        .centerCrop()
+                        .into(artwork);
+            }
         }
 
         return mCoordinatorLayout;
@@ -146,35 +152,22 @@ public class PlayerFragment
 
     @Override
     public void onResume() {
-        super.onResume();
         button.setOnClickListener(view -> playerPresenter.buttonCLicked());
+        super.onResume();
     }
 
 
     @Override
     public void onPause() {
-        super.onPause();
         button.setOnClickListener(null);
+        super.onPause();
     }
 
 
     @Override
     public void onStop() {
         super.onStop();
-        playerPresenter.listenToPlayer(false);
-        if (mBound && getActivity() != null) {
-            getActivity().unbindService(mConnection);
-            mBound = false;
-        }
-    }
-
-    @Override
-    public void showSurface() {
-        if (surface.getVisibility() == View.VISIBLE) {
-            return;
-        }
-        artwork.setVisibility(View.GONE);
-        surface.setVisibility(View.VISIBLE);
+        unBindService();
     }
 
     @Override
@@ -246,6 +239,14 @@ public class PlayerFragment
             }
             getActivity().bindService(serviceIntent(), mConnection, Context.BIND_IMPORTANT);
             mBound = true;
+        }
+    }
+
+    private void unBindService() {
+        playerPresenter.listenToPlayer(false);
+        if (mBound && getActivity() != null) {
+            getActivity().unbindService(mConnection);
+            mBound = false;
         }
     }
 

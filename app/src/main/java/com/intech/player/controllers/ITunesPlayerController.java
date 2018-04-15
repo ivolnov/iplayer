@@ -2,7 +2,6 @@ package com.intech.player.controllers;
 
 import android.view.SurfaceView;
 
-import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.intech.player.clean.boundaries.PlayerController;
 import com.intech.player.clean.boundaries.model.EventRequestModel;
@@ -46,7 +45,7 @@ public class ITunesPlayerController implements PlayerController {
     public Completable start() {
         return completableFrom(() ->  {
             player.setPlayWhenReady(true);
-            player.setVideoScalingMode(VIDEO_SCALING_MODE_SCALE_TO_FIT_WITH_CROPPING);
+            //player.setVideoScalingMode(VIDEO_SCALING_MODE_SCALE_TO_FIT_WITH_CROPPING);
         });
     }
 
@@ -82,11 +81,8 @@ public class ITunesPlayerController implements PlayerController {
     }
 
     public void setVideoSurface(SurfaceView view) {
-        final Player.VideoComponent component = player.getVideoComponent();
-        if (component != null) {
-            component.setVideoScalingMode(VIDEO_SCALING_MODE_SCALE_TO_FIT_WITH_CROPPING);
-            component.setVideoSurfaceView(view);
-        }
+        player.setVideoSurfaceView(view);
+        player.setVideoScalingMode(VIDEO_SCALING_MODE_SCALE_TO_FIT_WITH_CROPPING);
     }
 
     private Completable completableFrom(Runnable todo) {
@@ -113,7 +109,10 @@ public class ITunesPlayerController implements PlayerController {
                 .subscribeOn(Schedulers.single())
                 .observeOn(Schedulers.single())
                 .subscribe(
-                        s -> listener.onProgressChanged(PlayerPositionCalculator.calculate(player))
+                        s -> {
+                            player.setVideoScalingMode(VIDEO_SCALING_MODE_SCALE_TO_FIT_WITH_CROPPING);
+                            listener.onProgressChanged(PlayerPositionCalculator.calculate(player));
+                        }
                 );
     }
 

@@ -117,13 +117,11 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
     private void handleEvent(EventRequestModel event) {
         switch (event.getType()) {
             case Play:
-                getViewState().showSurface();
                 if (mButtonState == Play) {
                     toggleButton();
                 }
                 break;
             case Pause:
-                getViewState().showSurface();
                 if (mButtonState == Pause) {
                     toggleButton();
                 }

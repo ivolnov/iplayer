@@ -85,9 +85,12 @@ public class PlayerBoundForegroundService extends Service {
     private class LocalBinder extends Binder implements UiConsumer {
         public void plugIn(UiComponent ui) {
             mUi = new WeakReference<>(ui);
-            if (isVideo(mTrack)) {
-                setSurface(mUi.get().getSurface());
-            }
+
+            final SurfaceView surface = isVideo(mTrack)
+                    ? mUi.get().getSurface()
+                    : null;
+
+            setSurface(surface);
         }
     }
 
@@ -117,7 +120,10 @@ public class PlayerBoundForegroundService extends Service {
     @Override
     public void onRebind(Intent intent) {
         super.onRebind(intent);
-        handleTrack(mUi.get().getTrack());
+        final TrackViewModel track = mUi.get() != null
+                ? mUi.get().getTrack()
+                : mTrack;
+        handleTrack(track);
     }
 
     @Override
@@ -302,5 +308,4 @@ public class PlayerBoundForegroundService extends Service {
             controller.setVideoSurface(surface);
         }
     }
-
 }
