@@ -7,7 +7,7 @@ import com.arellomobile.mvp.viewstate.strategy.StateStrategyType;
 import com.intech.player.mvp.models.TrackViewModel;
 
 /**
- * Self explanatory.
+ * An {@link ErrorView} representing a list of tracks or a placeholder and a search field.
  *
  * @author Ivan Volnov
  * @since 01.04.18

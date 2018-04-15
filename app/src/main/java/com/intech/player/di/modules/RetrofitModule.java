@@ -13,7 +13,7 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 /**
- * Retrofit variations.
+ * Self explanatory.
  *
  * @author Ivan Volnov
  * @since 04.04.18

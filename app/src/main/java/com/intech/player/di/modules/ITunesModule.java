@@ -13,7 +13,7 @@ import dagger.Provides;
 import retrofit2.Retrofit;
 
 /**
- * ITunes api service.
+ * Self explanatory.
  *
  * @author Ivan Volnov
  * @since 04.04.18

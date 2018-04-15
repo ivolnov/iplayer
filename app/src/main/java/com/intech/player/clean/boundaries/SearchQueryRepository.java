@@ -5,7 +5,7 @@ import android.support.annotation.NonNull;
 import io.reactivex.Maybe;
 
 /**
- * Self explanatory.
+ * A repository for search queries.
  *
  * @author Ivan Volnov
  * @since 14.04.18

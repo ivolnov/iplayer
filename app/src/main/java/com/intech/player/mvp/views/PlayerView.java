@@ -4,7 +4,7 @@ import com.arellomobile.mvp.viewstate.strategy.AddToEndSingleStrategy;
 import com.arellomobile.mvp.viewstate.strategy.StateStrategyType;
 
 /**
- * Self explanatory.
+ * An {@link ErrorView} representing a player with a button and a progress bar.
  *
  * @author Ivan Volnov
  * @since 01.04.18

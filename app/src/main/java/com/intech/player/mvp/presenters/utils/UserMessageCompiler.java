@@ -6,7 +6,8 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 
 /**
- * Self explanatory.
+ * A <b>static</b> utility to map exceptions to something more human readable
+ * for potential usage in UI.
  *
  * @author Ivan Volnov
  * @since 08.04.18
@@ -26,7 +27,7 @@ public class UserMessageCompiler {
     }
 
     /**
-     * Stolen from <a href="https://stackoverflow.com/a/4812589/4003403">stackoverflow</a>
+     * From <a href="https://stackoverflow.com/a/4812589/4003403">here</a>.
      */
     private static String stackTraceOf(Throwable e) {
         final StringWriter errors = new StringWriter();

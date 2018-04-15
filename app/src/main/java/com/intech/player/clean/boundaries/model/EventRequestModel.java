@@ -1,7 +1,7 @@
 package com.intech.player.clean.boundaries.model;
 
 /**
- * Self explanatory.
+ *  A DTO passed to lower layers to represent a player's event.
  *
  * @author Ivan Volnov
  * @since 08.04.18

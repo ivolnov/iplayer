@@ -7,7 +7,7 @@ import com.intech.player.di.modules.FragmentModule;
 import dagger.Component;
 
 /**
- * Self explanatory.
+ * Activities dependencies.
  *
  * @author Ivan Volnov
  * @since 09.04.18

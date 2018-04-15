@@ -23,8 +23,8 @@ import static com.intech.player.util.TestUtils.expectedTrack;
 import static com.intech.player.util.TestUtils.http400Error;
 
 /**
- * Unit tests for the service that fetches data from ITunes.
- * Network is required for tests to pass.
+ * {@link ITunesTrackService} unit tests.
+ * Fetches data from ITunes thus network is required for tests to pass.
  *
  * @author Ivan Volnov
  * @since 04.04.18
@@ -72,6 +72,9 @@ public class ITunesTrackServiceUnitTest {
                 .assertValue(equalTo(EXPECTED_M4A_PREVIEW));
     }
 
+    /**
+     * Takes an infinity...
+     */
     @Test
     public void testGetVideoPreviewOk() {
         new ITunesTrackService(buildApi())

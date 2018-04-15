@@ -20,7 +20,8 @@ import static com.intech.player.mvp.models.utils.ModelConverter.asTrackViewModel
 import static com.intech.player.mvp.presenters.utils.ErrorHandler.handleError;
 
 /**
- * Self explanatory.
+ * A {@link TrackListView} presenter that delegates a search query to the use case
+ * and updates the view with incoming track view models.
  *
  * @author Ivan Volnov
  * @since 01.04.18

@@ -12,7 +12,7 @@ import static com.intech.player.util.TestData.EXPECTED_M4A_PREVIEW_URL;
 import static com.intech.player.util.TestData.EXPECTED_TRACK_NAME;
 
 /**
- * Self explanatory.
+ * A utility class for unit testing
  *
  * @author Ivan Volnov
  * @since 04.04.18

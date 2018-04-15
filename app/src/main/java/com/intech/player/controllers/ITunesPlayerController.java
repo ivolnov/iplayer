@@ -22,7 +22,13 @@ import io.reactivex.schedulers.Schedulers;
 import static com.google.android.exoplayer2.C.VIDEO_SCALING_MODE_SCALE_TO_FIT_WITH_CROPPING;
 
 /**
- * Self explanatory.
+ * A {@link PlayerController} implementation powered by {@link SimpleExoPlayer}.
+ * Delegates start and pause commands to the player.
+ * Provides a listener and a surface to the player.
+ * Releases player on stop.
+ * Exposes a stream of player events obtained form a {@link PlayerListener} and an
+ * interval observer that periodically emits progress events.
+ * Events polling is stopped when the last subscriber is gone.
  *
  * @author Ivan Volnov
  * @since 03.04.18
@@ -73,9 +79,11 @@ public class ITunesPlayerController implements PlayerController {
         .observeOn(Schedulers.single())
         .doOnSubscribe(this::startProgressPolling)
         .doOnDispose(()-> {
-            stopProgressPolling();
             listener.removeObserver(key);
-            player.removeListener(listener);
+            if (!listener.hasObservers()) {
+                player.removeListener(listener);
+                stopProgressPolling();
+            }
         });
     }
 

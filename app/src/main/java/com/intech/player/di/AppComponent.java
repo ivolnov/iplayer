@@ -16,7 +16,7 @@ import javax.inject.Singleton;
 import dagger.Component;
 
 /**
- * Application's dependencies.
+ * Global dependencies.
  *
  * @since 01.04.18
  * @author Ivan Volnov

@@ -1,11 +1,12 @@
 package com.intech.player.clean.boundaries.model;
 
 /**
- * A DTO passed to lower layers to represent preview entity's data..
+ * A DTO passed to lower layers to represent preview entity's data.
  *
  * @author Ivan Volnov
  * @since 04.04.18
  */
+@Deprecated
 public class PreviewRequestModel {
 
     public enum Type {M4V, M4A}

@@ -20,6 +20,7 @@ import static com.intech.player.android.utils.AndroidUtils.isNetworkAvailable;
 
 /**
  * Self explanatory.
+ * Should be used by everyone who is powered by OkHttp.
  *
  * @author Ivan Volnov
  * @since 09.04.18

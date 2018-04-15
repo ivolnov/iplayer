@@ -1,18 +1,18 @@
 package com.intech.player.mvp.views;
 
 import com.arellomobile.mvp.MvpView;
-import com.arellomobile.mvp.viewstate.strategy.AddToEndSingleStrategy;
+import com.arellomobile.mvp.viewstate.strategy.SkipStrategy;
 import com.arellomobile.mvp.viewstate.strategy.StateStrategyType;
 
 /**
- * Self explanatory.
+ * An {@link MvpView} that can show two type of errors.
  *
  * @author Ivan Volnov
  * @since 15.04.18
  */
 public interface ErrorView extends MvpView {
-    @StateStrategyType(AddToEndSingleStrategy.class)
+    @StateStrategyType(SkipStrategy.class)
     void showError(String error);
-    @StateStrategyType(AddToEndSingleStrategy.class)
+    @StateStrategyType(SkipStrategy.class)
     void showSevereError(String error);
 }

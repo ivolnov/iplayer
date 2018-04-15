@@ -21,7 +21,8 @@ import static com.intech.player.mvp.presenters.PlayerPresenter.ButtonState.Play;
 import static com.intech.player.mvp.presenters.utils.ErrorHandler.handleError;
 
 /**
- * Self explanatory.
+ * A presenter for a {@link PlayerView} that delegates ui play and pause events
+ * via use cases and listens for player's events to update the view.
  *
  * @author Ivan Volnov
  * @since 08.04.18

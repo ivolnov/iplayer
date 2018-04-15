@@ -38,13 +38,13 @@ import static com.intech.player.mvp.models.utils.ModelConverter.asTrackRequestMo
 import static com.intech.player.mvp.models.utils.ModelConverter.isVideo;
 
 /**
- * A started by {@link com.intech.player.android.fragments.PlayerFragment} service.
- * Keeps running in foreground until explicitly stopped, hopefully.
- * The idea is that when we leave a player through the back button it'll be stopped
- * otherwise we believe that current track is still relevant.
- * During rebind gets necessary data via {@link UiConsumer} interface implemented by
+ * A foreground service started by somebody.
+ * Keeps running in the foreground until explicitly stopped, hopefully.
+ * Not multithreaded at all.
+ * During bind/rebind gets necessary data via {@link UiConsumer} interface implemented by
  * {@link LocalBinder} to configure controller, notifications...
- *
+ * In case a new track is provided by the client rebuilds player's controller.
+ * Listens to players events to update notifications.
  *
  * @author Ivan Volnov
  * @since 01.04.18
@@ -60,26 +60,25 @@ public class PlayerBoundForegroundService extends Service {
 
     public static final int MAX_PROGRESS = 100;
 
+    /**
+     * Something that has a track, a surface and might be interested in player events.
+     */
     public interface UiComponent {
         TrackViewModel getTrack();
         SurfaceView getSurface();
         void startListening();
     }
 
+    /**
+     * Something that needs a {@link UiComponent}.
+     */
     public interface UiConsumer {
         void plugIn(UiComponent ui);
     }
 
-    private NotificationCompat.Builder mNotificationBuilder;
-    private NotificationManager mNotificationManager;
-
-    private int mProgress;
-    private TrackViewModel mTrack;
-
-    private Disposable mEventsDisposable;
-    private LocalBinder mBinder;
-    private UiComponent mUi;
-
+    /**
+     * This service's binder.
+     */
     private class LocalBinder extends Binder implements UiConsumer {
         public void plugIn(UiComponent ui) {
             mUi = ui;
@@ -91,6 +90,16 @@ public class PlayerBoundForegroundService extends Service {
             setSurface(surface);
         }
     }
+
+    private NotificationCompat.Builder mNotificationBuilder;
+    private NotificationManager mNotificationManager;
+
+    private int mProgress;
+    private TrackViewModel mTrack;
+
+    private Disposable mEventsDisposable;
+    private LocalBinder mBinder;
+    private UiComponent mUi;
 
     @Inject
     PlayerController playerController;

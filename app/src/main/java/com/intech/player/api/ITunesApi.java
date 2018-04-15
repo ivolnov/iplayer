@@ -9,7 +9,7 @@ import retrofit2.http.Query;
 import retrofit2.http.Url;
 
 /**
- * Self explanatory.
+ * Retrofit powered api to ITunes that provides a track response model.
  *
  * @author Ivan Volnov
  * @since 03.04.18

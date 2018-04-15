@@ -12,7 +12,8 @@ import io.reactivex.Observable;
 import io.reactivex.Single;
 
 /**
- * Self explanatory.
+ * A {@link TrackService} implementation that uses {@link ITunesApi} to provide
+ * request model instances with tracks' data.
  *
  * @author Ivan Volnov
  * @since 03.04.18

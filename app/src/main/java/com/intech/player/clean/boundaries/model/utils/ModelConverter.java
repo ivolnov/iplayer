@@ -12,7 +12,8 @@ import io.reactivex.Observable;
 import static com.intech.player.App.INVALID_ID;
 
 /**
- * Self explanatory.
+ * A <b>static</b> utility that converts data between request or response models used in
+ * clean architecture boundaries.
  *
  * @author Ivan Volnov
  * @since 08.04.18

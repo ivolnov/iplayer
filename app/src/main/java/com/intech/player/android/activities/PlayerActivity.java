@@ -13,6 +13,12 @@ import javax.inject.Inject;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
+/**
+ * An activity that informs its listeners about back button press.
+ *
+ * @author Ivan Volnov
+ * @since 01.04.18
+ */
 public class PlayerActivity extends AppActivity {
 
     public interface OnBackPressedListener {

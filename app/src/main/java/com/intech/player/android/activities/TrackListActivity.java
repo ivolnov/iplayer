@@ -13,6 +13,12 @@ import javax.inject.Inject;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
+/**
+ * Self explanatory.
+ *
+ * @author Ivan Volnov
+ * @since 01.04.18
+ */
 public class TrackListActivity extends AppActivity {
 
     @BindView(R.id.fragment_container)

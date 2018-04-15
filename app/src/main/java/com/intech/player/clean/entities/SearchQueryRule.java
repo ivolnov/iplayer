@@ -1,7 +1,8 @@
 package com.intech.player.clean.entities;
 
 /**
- * An entity of a search query business rule to checks constraints.
+ * A business entity.
+ * A rule that validates a search query,
  *
  * @author Ivan Volnov
  * @since 08.04.18

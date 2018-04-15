@@ -7,7 +7,7 @@ import io.reactivex.Observable;
 
 
 /**
- * Self explanatory.
+ * An interactor to obtain a stream of player's events request models.
  *
  * @author Ivan Volnov
  * @since 08.04.18

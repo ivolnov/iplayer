@@ -5,15 +5,15 @@ import com.intech.player.clean.boundaries.SearchQueryRepository;
 import io.reactivex.Single;
 import io.reactivex.SingleObserver;
 
+import static com.intech.player.App.EMPTY_STRING;
+
 /**
- * Self explanatory.
+ * An interactor to get the last search query if exists or a promo query.
  *
  * @author Ivan Volnov
  * @since 14.04.18
  */
 public class GetLastSearchQueryUseCase {
-
-    private static final String EMPTY_STRING = "";
 
     private final SearchQueryRepository repository;
 

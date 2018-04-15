@@ -13,7 +13,7 @@ import io.reactivex.MaybeObserver;
 import static android.content.Context.MODE_PRIVATE;
 
 /**
- * Self explanatory.
+ * {@link SearchQueryRepository} implementation that stores queries in {@link SharedPreferences}.
  *
  * @author Ivan Volnov
  * @since 14.04.18

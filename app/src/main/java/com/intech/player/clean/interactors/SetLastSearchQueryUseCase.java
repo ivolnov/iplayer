@@ -7,7 +7,7 @@ import com.intech.player.clean.boundaries.SearchQueryRepository;
 import io.reactivex.Maybe;
 
 /**
- * Self explanatory.
+ * An interactor that persists a query as the last one.
  *
  * @author Ivan Volnov
  * @since 14.04.18

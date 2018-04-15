@@ -4,7 +4,7 @@ import com.intech.player.clean.boundaries.model.TrackRequestModel;
 import com.intech.player.mvp.models.TrackViewModel;
 
 /**
- * Self explanatory.
+ * A <b>static</b> utility to convert between view model and request model.
  *
  * @author Ivan Volnov
  * @since 08.04.18

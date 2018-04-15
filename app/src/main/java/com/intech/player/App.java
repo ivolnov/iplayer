@@ -16,6 +16,7 @@ import com.intech.player.di.modules.ContextModule;
  */
 public class App extends Application {
 
+    public static final String EMPTY_STRING = "";
     public static final int INVALID_ID = -1;
     public static final int TOLERABLE_ERROR_AMOUNT = 2;
 

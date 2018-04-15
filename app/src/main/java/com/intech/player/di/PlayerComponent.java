@@ -12,7 +12,7 @@ import dagger.BindsInstance;
 import dagger.Component;
 
 /**
- * Self explanatory.
+ * Player controller's dependencies.
  *
  * @author Ivan Volnov
  * @since 06.04.18

@@ -4,7 +4,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 /**
- * Self explanatory.
+ * A DTO for the MVP layer representing a track.
  *
  * @author Ivan Volnov
  * @since 08.04.18

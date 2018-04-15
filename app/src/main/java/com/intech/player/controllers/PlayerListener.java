@@ -18,7 +18,8 @@ import static com.intech.player.clean.boundaries.model.utils.ModelConverter.asPl
 import static com.intech.player.clean.boundaries.model.utils.ModelConverter.asProgressEvent;
 
 /**
- * Self explanatory.
+ * An {@link com.google.android.exoplayer2.Player.EventListener} implementation.
+ * Stores observers and feeds them an event request model on each incoming event.
  *
  * @author Ivan Volnov
  * @since 07.04.18
@@ -33,6 +34,10 @@ public class PlayerListener implements Player.EventListener {
         this.playEvent = asPlayEvent(track);
         this.pauseEvent = asPauseEvent(track);
         this.observers = new ConcurrentHashMap<>();
+    }
+
+    public boolean hasObservers() {
+        return !observers.isEmpty();
     }
 
     public void removeObserver(String key) {

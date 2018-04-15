@@ -8,7 +8,7 @@ import com.intech.player.mvp.views.ErrorView;
 import static com.intech.player.App.TOLERABLE_ERROR_AMOUNT;
 
 /**
- * Self explanatory.
+ * A <b>static</b> utility to help an {@link ErrorView} to determine how it should behave.
  *
  * @author Ivan Volnov
  * @since 15.04.18

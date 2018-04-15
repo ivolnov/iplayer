@@ -5,7 +5,7 @@ import com.intech.player.clean.boundaries.PlayerController;
 import io.reactivex.Completable;
 
 /**
- * Self explanatory.
+ * An interactor that pauses a player on subscription.
  *
  * @author Ivan Volnov
  * @since 06.04.18

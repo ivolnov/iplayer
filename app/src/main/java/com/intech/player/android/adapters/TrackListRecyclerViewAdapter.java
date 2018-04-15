@@ -11,7 +11,6 @@ import android.widget.TextView;
 
 import com.intech.player.App;
 import com.intech.player.R;
-import com.intech.player.clean.boundaries.model.TrackRequestModel;
 import com.intech.player.mvp.models.TrackViewModel;
 import com.squareup.picasso.Picasso;
 
@@ -24,7 +23,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 /**
- * A {@link RecyclerView.Adapter} for {@link TrackRequestModel} entities.
+ * A {@link RecyclerView.Adapter} with {@link TrackViewModel} entities.
  *
  * @author Ivan Volnov
  * @since 01.04.18

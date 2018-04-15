@@ -7,7 +7,7 @@ import com.intech.player.clean.entities.SearchQueryRule;
 import io.reactivex.Observable;
 
 /**
- * Self explanatory.
+ * An interactor that gets a stream of track request models for the given query if valid.
  *
  * @author Ivan Volnov
  * @since 04.04.18

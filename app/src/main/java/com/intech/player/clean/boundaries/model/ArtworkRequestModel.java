@@ -6,6 +6,7 @@ package com.intech.player.clean.boundaries.model;
  * @author Ivan Volnov
  * @since 04.04.18
  */
+@Deprecated
 public class ArtworkRequestModel {
     private byte[] bytes;
 

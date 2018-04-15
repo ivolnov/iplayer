@@ -5,7 +5,7 @@ import com.intech.player.clean.boundaries.PlayerController;
 import io.reactivex.Completable;
 
 /**
- * Self explanatory.
+ * An interactor that starts a player on subscription.
  *
  * @author Ivan Volnov
  * @since 05.04.18

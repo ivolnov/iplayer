@@ -33,6 +33,8 @@ import static com.intech.player.android.utils.AndroidUtils.okIcon;
 
 /**
  * A {@link TrackListView} implementation.
+ * Delegates search queries to its presenter and shows an image placeholder instead of a list
+ * when told so.
  *
  * @author Ivan Volnov
  * @since 01.04.18

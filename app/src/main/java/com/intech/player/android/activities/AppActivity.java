@@ -8,9 +8,12 @@ import android.support.v7.app.AppCompatActivity;
 import com.intech.player.R;
 
 /**
- * Created by ivan volnov on 13.04.2018.
+ * An activity with a custom action bar.
+ *
+ * @author Ivan Volnov
+ * @since 13.04.18
  */
-class AppActivity extends AppCompatActivity {
+public class AppActivity extends AppCompatActivity {
 	@Override
 	protected void onCreate(@Nullable Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);

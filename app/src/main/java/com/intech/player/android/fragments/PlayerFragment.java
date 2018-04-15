@@ -42,6 +42,12 @@ import static com.intech.player.mvp.models.utils.ModelConverter.isVideo;
 
 /**
  * A {@link PlayerView} implementation.
+ * Starts a player foreground service during creation and binds to it which will
+ * effectively result in rebinding on consequent recreations.
+ * Listens to the back button press to stop the service as nobody else will.
+ * Implements {@link com.intech.player.android.services.PlayerBoundForegroundService.UiComponent}
+ * to provide a surface for the player, current track and to find out when presenter should
+ * listen to player events as the fragment may be ready much earlier than the service itself.
  *
  * @author Ivan Volnov
  * @since 01.04.18
