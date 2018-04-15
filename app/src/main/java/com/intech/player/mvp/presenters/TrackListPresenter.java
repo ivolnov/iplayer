@@ -1,16 +1,13 @@
 package com.intech.player.mvp.presenters;
 
 import android.support.annotation.NonNull;
-import android.util.Log;
 
 import com.arellomobile.mvp.InjectViewState;
 import com.arellomobile.mvp.MvpPresenter;
 import com.intech.player.App;
-import com.intech.player.BuildConfig;
 import com.intech.player.clean.interactors.GetLastSearchQueryUseCase;
 import com.intech.player.clean.interactors.GetTrackListUseCase;
 import com.intech.player.clean.interactors.SetLastSearchQueryUseCase;
-import com.intech.player.mvp.presenters.utils.UserMessageCompiler;
 import com.intech.player.mvp.views.TrackListView;
 
 import javax.inject.Inject;
@@ -20,6 +17,7 @@ import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 
 import static com.intech.player.mvp.models.utils.ModelConverter.asTrackViewModel;
+import static com.intech.player.mvp.presenters.utils.ErrorHandler.handleError;
 
 /**
  * Self explanatory.
@@ -56,7 +54,7 @@ public class TrackListPresenter extends MvpPresenter<TrackListView> {
                             getViewState().applySearchQuery(query);
                             mLastQueryDisposable.dispose();
                         },
-                        this::handleError);
+                        this::delegateError);
     }
 
     public void onEnterQuery(@NonNull String query) {
@@ -65,7 +63,7 @@ public class TrackListPresenter extends MvpPresenter<TrackListView> {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnSuccess(this::getTracks)
-                .doOnError(this::handleError)
+                .doOnError(this::delegateError)
                 .subscribe();
     }
 
@@ -78,7 +76,7 @@ public class TrackListPresenter extends MvpPresenter<TrackListView> {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
                         track -> getViewState().addTrack(asTrackViewModel(track)),
-                        this::handleError
+                        this::delegateError
                 );
     }
 
@@ -88,11 +86,7 @@ public class TrackListPresenter extends MvpPresenter<TrackListView> {
         }
     }
 
-    private void handleError(Throwable error) {
-        final String message = UserMessageCompiler.from(error);
-        if (BuildConfig.DEBUG) {
-            Log.e(TAG, message);
-        }
-        getViewState().showError(message);
+    private void delegateError(Throwable error) {
+        handleError(TAG, getViewState(), error);
     }
 }

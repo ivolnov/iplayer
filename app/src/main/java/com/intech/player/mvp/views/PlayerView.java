@@ -1,6 +1,5 @@
 package com.intech.player.mvp.views;
 
-import com.arellomobile.mvp.MvpView;
 import com.arellomobile.mvp.viewstate.strategy.AddToEndSingleStrategy;
 import com.arellomobile.mvp.viewstate.strategy.SkipStrategy;
 import com.arellomobile.mvp.viewstate.strategy.StateStrategyType;
@@ -11,11 +10,9 @@ import com.arellomobile.mvp.viewstate.strategy.StateStrategyType;
  * @author Ivan Volnov
  * @since 01.04.18
  */
-public interface PlayerView extends MvpView {
+public interface PlayerView extends ErrorView {
     @StateStrategyType(SkipStrategy.class)
     void showSurface();
-    @StateStrategyType(AddToEndSingleStrategy.class)
-    void showError(String error);
     @StateStrategyType(AddToEndSingleStrategy.class)
     void setButtonPlay();
     @StateStrategyType(AddToEndSingleStrategy.class)

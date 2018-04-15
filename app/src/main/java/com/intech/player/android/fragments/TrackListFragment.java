@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
@@ -26,6 +27,8 @@ import com.intech.player.mvp.views.TrackListView;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+
+import static com.intech.player.android.utils.AndroidUtils.okIcon;
 
 /**
  * A {@link TrackListView} implementation.
@@ -104,6 +107,18 @@ public class TrackListFragment extends MvpAppCompatFragment
         Snackbar
                 .make(mCoordinatorLayout, message, Snackbar.LENGTH_LONG)
                 .show();
+    }
+
+    @Override
+    public void showSevereError(String message) {
+        if (getActivity() != null) {
+            new AlertDialog.Builder(getActivity())
+                    .setTitle(getString(R.string.severe_error_title))
+                    .setMessage(message)
+                    .setPositiveButtonIcon(okIcon(getActivity()))
+                    .setPositiveButton(null, null)
+                    .show();
+        }
     }
 
     @Override

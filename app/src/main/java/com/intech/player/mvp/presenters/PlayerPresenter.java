@@ -1,17 +1,13 @@
 package com.intech.player.mvp.presenters;
 
-import android.util.Log;
-
 import com.arellomobile.mvp.InjectViewState;
 import com.arellomobile.mvp.MvpPresenter;
 import com.intech.player.App;
-import com.intech.player.BuildConfig;
 import com.intech.player.clean.boundaries.model.EventRequestModel;
 import com.intech.player.clean.interactors.GetPlayerEventsUseCase;
 import com.intech.player.clean.interactors.PausePlayerUseCase;
 import com.intech.player.clean.interactors.StartPlayerUseCase;
 import com.intech.player.mvp.models.TrackViewModel;
-import com.intech.player.mvp.presenters.utils.UserMessageCompiler;
 import com.intech.player.mvp.views.PlayerView;
 
 import javax.inject.Inject;
@@ -22,6 +18,7 @@ import io.reactivex.schedulers.Schedulers;
 
 import static com.intech.player.mvp.presenters.PlayerPresenter.ButtonState.Pause;
 import static com.intech.player.mvp.presenters.PlayerPresenter.ButtonState.Play;
+import static com.intech.player.mvp.presenters.utils.ErrorHandler.handleError;
 
 /**
  * Self explanatory.
@@ -44,9 +41,7 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
     GetPlayerEventsUseCase getPlayerEventsUseCase;
 
     private ButtonState mButtonState = Play;
-
     private Disposable mPlayerEventsDisposable;
-
     private TrackViewModel mTrack;
 
     public PlayerPresenter() {
@@ -74,7 +69,7 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(
                             this::handleEvent,
-                            this::handleError);
+                            this::delegateError);
         }
     }
 
@@ -91,7 +86,7 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(
                                 this::toggleButton,
-                                this::handleError);
+                                this::delegateError);
 
                 break;
             case Pause:
@@ -101,7 +96,7 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(
                                 this::toggleButton,
-                                this::handleError);
+                                this::delegateError);
                 break;
         }
     }
@@ -139,12 +134,8 @@ public class PlayerPresenter extends MvpPresenter<PlayerView> {
         }
     }
 
-    private void handleError(Throwable error) {
-        final String message = UserMessageCompiler.from(error);
-        if (BuildConfig.DEBUG) {
-            Log.e(TAG, message);
-        }
-        getViewState().showError(message);
+    private void delegateError(Throwable error) {
+        handleError(TAG, getViewState(), error);
     }
 
     private void disposeEvents() {

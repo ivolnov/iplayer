@@ -11,6 +11,7 @@ import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.SurfaceView;
 import android.view.View;
@@ -35,6 +36,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 import static com.intech.player.android.fragments.TrackListFragment.EXTRA_SELECTED_TRACK;
+import static com.intech.player.android.utils.AndroidUtils.okIcon;
 import static com.intech.player.android.utils.AndroidUtils.oreo;
 
 /**
@@ -180,6 +182,19 @@ public class PlayerFragment
         Snackbar
                 .make(mCoordinatorLayout, error, Snackbar.LENGTH_LONG)
                 .show();
+    }
+
+    @Override
+    public void showSevereError(String message) {
+        if (getActivity() != null) {
+            new AlertDialog.Builder(getActivity())
+                    .setTitle(getString(R.string.severe_error_title))
+                    .setMessage(message)
+                    .setPositiveButtonIcon(okIcon(getActivity()))
+                    .setPositiveButton(null, null)
+                    .create()
+                    .show();
+        }
     }
 
     @Override

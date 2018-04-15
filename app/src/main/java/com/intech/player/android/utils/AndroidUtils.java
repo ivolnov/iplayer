@@ -1,9 +1,13 @@
 package com.intech.player.android.utils;
 
 import android.content.Context;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Build;
+
+import com.intech.player.R;
 
 /**
  * Self explanatory.
@@ -23,6 +27,17 @@ public class AndroidUtils {
         }
 
         return false;
+    }
+
+    public static Drawable okIcon(Context context) {
+        final Drawable icon = context.getResources().getDrawable(R.drawable.ic_ok);
+        icon
+                .mutate()
+                .setColorFilter(
+                        context.getResources().getColor(R.color.colorSecondaryDark),
+                        PorterDuff.Mode.SRC_IN);
+
+        return icon;
     }
 
     public static boolean oreo() {
