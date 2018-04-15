@@ -15,6 +15,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 
 import com.arellomobile.mvp.MvpAppCompatFragment;
 import com.arellomobile.mvp.presenter.InjectPresenter;
@@ -46,6 +47,8 @@ public class TrackListFragment extends MvpAppCompatFragment
 
     @BindView(R.id.list)
     RecyclerView recyclerView;
+    @BindView(R.id.placeholder)
+    ImageView placeholder;
 
     private SearchView mSearchView;
     private CoordinatorLayout mCoordinatorLayout;
@@ -142,5 +145,19 @@ public class TrackListFragment extends MvpAppCompatFragment
                 return false;
             }
         };
+    }
+
+    public void showPlaceholder() {
+        if (placeholder.getVisibility() == View.GONE) {
+            recyclerView.setVisibility(View.GONE);
+            placeholder.setVisibility(View.VISIBLE);
+        }
+    }
+
+    public  void showList() {
+        if (recyclerView.getVisibility() == View.GONE) {
+            placeholder.setVisibility(View.GONE);
+            recyclerView.setVisibility(View.VISIBLE);
+        }
     }
 }

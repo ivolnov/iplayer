@@ -65,17 +65,20 @@ public class TrackListPresenter extends MvpPresenter<TrackListView> {
                 .doOnSuccess(this::getTracks)
                 .doOnError(this::delegateError)
                 .subscribe();
+        getViewState().showPlaceholder();
     }
 
     private void getTracks(String query) {
         dispose();
-
         mTrackListDisposable = getTrackListUseCase
                 .execute(query)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
-                        track -> getViewState().addTrack(asTrackViewModel(track)),
+                        track -> {
+                            getViewState().showList();
+                            getViewState().addTrack(asTrackViewModel(track));
+                        },
                         this::delegateError
                 );
     }

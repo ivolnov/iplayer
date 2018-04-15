@@ -9,7 +9,7 @@ import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
 import com.intech.player.clean.boundaries.model.EventRequestModel;
 import com.intech.player.clean.boundaries.model.TrackRequestModel;
 
-import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 import io.reactivex.Observer;
 
@@ -25,14 +25,14 @@ import static com.intech.player.clean.boundaries.model.utils.ModelConverter.asPr
  */
 public class PlayerListener implements Player.EventListener {
 
-    private HashMap<String, Observer<? super EventRequestModel>> observers;
+    private ConcurrentHashMap<String, Observer<? super EventRequestModel>> observers;
     private final EventRequestModel playEvent;
     private final EventRequestModel pauseEvent;
 
     public PlayerListener(TrackRequestModel track)  {
         this.playEvent = asPlayEvent(track);
         this.pauseEvent = asPauseEvent(track);
-        this.observers = new HashMap<>();
+        this.observers = new ConcurrentHashMap<>();
     }
 
     public void removeObserver(String key) {

@@ -45,7 +45,6 @@ public class ITunesPlayerController implements PlayerController {
     public Completable start() {
         return completableFrom(() ->  {
             player.setPlayWhenReady(true);
-            //player.setVideoScalingMode(VIDEO_SCALING_MODE_SCALE_TO_FIT_WITH_CROPPING);
         });
     }
 

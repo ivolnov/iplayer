@@ -26,8 +26,6 @@ import com.intech.player.di.DaggerPlayerComponent;
 import com.intech.player.mvp.models.TrackViewModel;
 import com.intech.player.mvp.presenters.utils.UserMessageCompiler;
 
-import java.lang.ref.WeakReference;
-
 import javax.inject.Inject;
 
 import io.reactivex.disposables.Disposable;
@@ -80,14 +78,14 @@ public class PlayerBoundForegroundService extends Service {
 
     private Disposable mEventsDisposable;
     private LocalBinder mBinder;
-    private WeakReference<UiComponent> mUi;
+    private UiComponent mUi;
 
     private class LocalBinder extends Binder implements UiConsumer {
         public void plugIn(UiComponent ui) {
-            mUi = new WeakReference<>(ui);
+            mUi = ui;
 
             final SurfaceView surface = isVideo(mTrack)
-                    ? mUi.get().getSurface()
+                    ? mUi.getSurface()
                     : null;
 
             setSurface(surface);
@@ -100,7 +98,6 @@ public class PlayerBoundForegroundService extends Service {
     public PlayerBoundForegroundService() {
         App.getAppComponent().inject(this);
         mBinder = new LocalBinder();
-        mUi = new WeakReference<>(null);
     }
 
     @Override
@@ -120,10 +117,7 @@ public class PlayerBoundForegroundService extends Service {
     @Override
     public void onRebind(Intent intent) {
         super.onRebind(intent);
-        final TrackViewModel track = mUi.get() != null
-                ? mUi.get().getTrack()
-                : mTrack;
-        handleTrack(track);
+        handleTrack(mUi.getTrack());
     }
 
     @Override
@@ -239,10 +233,10 @@ public class PlayerBoundForegroundService extends Service {
     private NotificationCompat.Builder getNotificationBuilder() {
         if (mNotificationBuilder == null) {
             mNotificationBuilder = new NotificationCompat.Builder(this, CHANNEL_ID)
-                    .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-					.setContentIntent(contentIntent());
+                    .setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
         }
         mNotificationBuilder
+                .setContentIntent(contentIntent())
                 .setContentTitle(mTrack.getArtist())
                 .setContentText(mTrack.getTrackName())
                 .setProgress(MAX_PROGRESS, mProgress, false);
@@ -285,7 +279,7 @@ public class PlayerBoundForegroundService extends Service {
 						this,
 						INVALID_ID,
 						new Intent[] {main, player},
-						PendingIntent.FLAG_CANCEL_CURRENT);
+						PendingIntent.FLAG_UPDATE_CURRENT);
 	}
 
 	private void disposeEvents() {
@@ -295,10 +289,9 @@ public class PlayerBoundForegroundService extends Service {
     }
 
     private void pingUi() {
-        final UiComponent ui = mUi.get();
-        if (ui != null) {
-            ui.startListening();
-            mUi.clear();
+        if (mUi != null) {
+            mUi.startListening();
+            mUi = null;
         }
     }
 

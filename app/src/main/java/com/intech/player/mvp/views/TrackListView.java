@@ -17,4 +17,8 @@ public interface TrackListView extends ErrorView {
     void addTrack(@NonNull TrackViewModel track);
     @StateStrategyType(SkipStrategy.class)
     void applySearchQuery(String query);
+    @StateStrategyType(SkipStrategy.class)
+    void showPlaceholder();
+    @StateStrategyType(SkipStrategy.class)
+    void showList();
 }

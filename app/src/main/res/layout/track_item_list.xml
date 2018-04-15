@@ -8,6 +8,7 @@
         xmlns:tools="http://schemas.android.com/tools"
         android:id="@+id/list"
         android:name="com.intech.player.fragments.TrackListFragment"
+        android:visibility="gone"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginLeft="@dimen/text_margin"
@@ -16,7 +17,6 @@
         tools:context=".android.fragments.TrackListFragment"
         tools:listitem="@layout/track_item" />
     <ImageView
-        android:visibility="gone"
         android:id="@+id/placeholder"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
